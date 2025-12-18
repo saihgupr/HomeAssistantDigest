@@ -13,14 +13,14 @@ document.addEventListener('DOMContentLoaded', () => {
 async function initSetup() {
     try {
         // Load existing profile data
-        const profileRes = await fetch('/api/profile');
+        const profileRes = await fetch('api/profile');
         const profileData = await profileRes.json();
         if (profileData.profile) {
             answers = profileData.profile;
         }
 
         // Load questions
-        const questionsRes = await fetch('/api/profile/questions');
+        const questionsRes = await fetch('api/profile/questions');
         const questionsData = await questionsRes.json();
         questions = questionsData.questions;
 
@@ -247,7 +247,7 @@ async function saveProfile() {
     nextBtn.textContent = 'Saving...';
 
     try {
-        const response = await fetch('/api/profile', {
+        const response = await fetch('api/profile', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(answers)
@@ -258,7 +258,7 @@ async function saveProfile() {
         }
 
         // Redirect to main page
-        window.location.href = '/';
+        window.location.href = 'index.html';
     } catch (error) {
         console.error('Failed to save profile:', error);
         nextBtn.disabled = false;

@@ -178,10 +178,10 @@ function updateUIState(status) {
             startSetupBtn.disabled = true;
         } else if (!status.profileComplete) {
             startSetupBtn.textContent = 'Set Up Profile';
-            startSetupBtn.onclick = () => { window.location.href = '/setup.html'; };
+            startSetupBtn.onclick = () => { window.location.href = 'setup.html'; };
         } else if (!status.entitiesDiscovered) {
             startSetupBtn.textContent = 'Discover Entities';
-            startSetupBtn.onclick = () => { window.location.href = '/entities.html'; };
+            startSetupBtn.onclick = () => { window.location.href = 'entities.html'; };
         }
     }
 }
@@ -260,7 +260,7 @@ async function loadFullDigest(digestId) {
 
 async function loadDigestHistory() {
     try {
-        const response = await fetch('/api/digest/list?limit=5');
+        const response = await fetch('api/digest/list?limit=5');
         const data = await response.json();
 
         if (data.digests && data.digests.length > 1) {
@@ -287,7 +287,7 @@ async function loadDigestHistory() {
 // ============================================
 
 async function handleStartSetup() {
-    window.location.href = '/setup.html';
+    window.location.href = 'setup.html';
 }
 
 async function handleGenerateDigest() {
@@ -335,7 +335,7 @@ async function handleTestNotification() {
     actionStatus.className = 'action-status info';
 
     try {
-        const response = await fetch('/api/digest/test-notification', { method: 'POST' });
+        const response = await fetch('api/digest/test-notification', { method: 'POST' });
         const data = await response.json();
 
         if (data.success) {

@@ -15,7 +15,7 @@ async function checkConnection() {
     const discoveryCard = document.getElementById('discovery-card');
 
     try {
-        const response = await fetch('/api/entities/connection');
+        const response = await fetch('api/entities/connection');
         const data = await response.json();
 
         if (data.connected) {
@@ -49,7 +49,7 @@ async function discoverEntities() {
     showLoading('Discovering entities...');
 
     try {
-        const response = await fetch('/api/entities/discover');
+        const response = await fetch('api/entities/discover');
 
         if (!response.ok) {
             throw new Error(`Discovery failed: ${response.statusText}`);
@@ -190,7 +190,7 @@ async function saveEntities() {
             storage_strategy: e.storage_strategy
         }));
 
-        const response = await fetch('/api/entities/save', {
+        const response = await fetch('api/entities/save', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ entities: toSave })
@@ -204,7 +204,7 @@ async function saveEntities() {
 
         // Redirect to main dashboard
         alert(`Saved ${result.saved} entities (${result.monitored} will be monitored)`);
-        window.location.href = '/';
+        window.location.href = 'index.html';
     } catch (error) {
         console.error('Save error:', error);
         alert(`Save failed: ${error.message}`);
