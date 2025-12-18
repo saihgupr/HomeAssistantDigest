@@ -724,3 +724,194 @@ body {
         gap: 0.75rem;
     }
 }
+
+/* ============================================
+   Dashboard Specific Styles
+   ============================================ */
+
+/* Status value colors */
+.status-item .value.success {
+    color: var(--success);
+}
+
+.status-item .value.warning {
+    color: var(--warning);
+}
+
+.status-item .value.error {
+    color: var(--danger);
+}
+
+/* Step completion styling */
+.step.complete .step-number {
+    background: var(--success);
+    border-color: var(--success);
+    color: white;
+}
+
+.step.complete .step-content h3 {
+    color: var(--success);
+}
+
+/* Actions Card */
+.actions-card .action-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.btn-secondary {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: var(--bg-primary);
+    border-color: var(--accent);
+}
+
+.action-status {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    min-height: 2.5rem;
+}
+
+.action-status.info {
+    background: rgba(88, 166, 255, 0.1);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+}
+
+.action-status.success {
+    background: rgba(63, 185, 80, 0.1);
+    border: 1px solid var(--success);
+    color: var(--success);
+}
+
+.action-status.error {
+    background: rgba(248, 81, 73, 0.1);
+    border: 1px solid var(--danger);
+    color: var(--danger);
+}
+
+/* Digest Card */
+.digest-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.digest-header h2 {
+    margin-bottom: 0;
+}
+
+.digest-time {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.digest-content {
+    line-height: 1.7;
+}
+
+.digest-content h1,
+.digest-content h2,
+.digest-content h3 {
+    margin: 1rem 0 0.5rem;
+    color: var(--text-primary);
+}
+
+.digest-content h1 {
+    font-size: 1.4rem;
+}
+
+.digest-content h2 {
+    font-size: 1.2rem;
+}
+
+.digest-content h3 {
+    font-size: 1.1rem;
+}
+
+.digest-content p {
+    margin: 0.5rem 0;
+    color: var(--text-secondary);
+}
+
+.digest-content li {
+    margin: 0.25rem 0;
+    margin-left: 1.5rem;
+    color: var(--text-secondary);
+}
+
+.digest-content hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.5rem 0;
+}
+
+.digest-content strong {
+    color: var(--text-primary);
+}
+
+/* Digest History List */
+.digest-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.digest-list-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    align-items: center;
+}
+
+.digest-list-item:hover {
+    background: var(--bg-primary);
+}
+
+.digest-date {
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+}
+
+.digest-summary {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.digest-attention {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    background: var(--bg-secondary);
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.digest-attention.warning {
+    background: rgba(210, 153, 34, 0.2);
+    color: var(--warning);
+}
+
+/* Status grid update for 3 columns on larger screens */
+@media (min-width: 600px) {
+    .status-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}

@@ -1,129 +1,283 @@
-/**
- * Home Assistant Digest - Frontend Application
- */
+// Home Assistant Digest - Dashboard JavaScript
 
 document.addEventListener('DOMContentLoaded', () => {
-    initApp();
+    init();
 });
 
-async function initApp() {
+async function init() {
+    await loadStatus();
+    await loadDigestStatus();
+    setupEventListeners();
+}
+
+function setupEventListeners() {
+    const startSetupBtn = document.getElementById('start-setup');
+    const generateDigestBtn = document.getElementById('generate-digest');
+    const testNotificationBtn = document.getElementById('test-notification');
+
+    if (startSetupBtn) {
+        startSetupBtn.addEventListener('click', handleStartSetup);
+    }
+    if (generateDigestBtn) {
+        generateDigestBtn.addEventListener('click', handleGenerateDigest);
+    }
+    if (testNotificationBtn) {
+        testNotificationBtn.addEventListener('click', handleTestNotification);
+    }
+}
+
+async function loadStatus() {
     try {
-        const status = await fetchStatus();
-        updateStatusDisplay(status);
+        const response = await fetch('/api/status');
+        const status = await response.json();
         updateUIState(status);
     } catch (error) {
-        console.error('Failed to initialize app:', error);
-        showError('Failed to connect to server');
+        console.error('Failed to load status:', error);
+        document.getElementById('api-status').textContent = 'Error';
     }
-}
-
-async function fetchStatus() {
-    const response = await fetch('/api/status');
-    if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-    }
-    return response.json();
-}
-
-function updateStatusDisplay(status) {
-    // API Key status
-    const apiStatusEl = document.getElementById('api-status');
-    if (status.configured) {
-        apiStatusEl.textContent = 'Configured';
-        apiStatusEl.classList.add('configured');
-        apiStatusEl.classList.remove('not-configured');
-    } else {
-        apiStatusEl.textContent = 'Not Configured';
-        apiStatusEl.classList.add('not-configured');
-        apiStatusEl.classList.remove('configured');
-    }
-
-    // Digest time
-    document.getElementById('digest-time').textContent = status.digestTime;
-
-    // History days
-    document.getElementById('history-days').textContent = `${status.historyDays} days`;
-
-    // Entities count
-    document.getElementById('entities-count').textContent =
-        status.entitiesMonitored === 0
-            ? 'Not set up'
-            : `${status.entitiesMonitored} entities`;
 }
 
 function updateUIState(status) {
+    // Update status indicators
+    const apiStatus = document.getElementById('api-status');
+    const profileStatus = document.getElementById('profile-status');
+    const entitiesCount = document.getElementById('entities-count');
+    const snapshotCount = document.getElementById('snapshot-count');
+    const schedulerStatus = document.getElementById('scheduler-status');
+    const nextDigest = document.getElementById('next-digest');
+
+    // API Key status
+    apiStatus.textContent = status.configured ? '✓ Configured' : '✗ Missing';
+    apiStatus.className = `value ${status.configured ? 'success' : 'error'}`;
+
+    // Profile status
+    profileStatus.textContent = status.profileComplete ? '✓ Complete' : '✗ Incomplete';
+    profileStatus.className = `value ${status.profileComplete ? 'success' : 'warning'}`;
+
+    // Entities count
+    entitiesCount.textContent = `${status.entitiesMonitored || 0} monitored`;
+    entitiesCount.className = `value ${status.entitiesMonitored > 0 ? 'success' : ''}`;
+
+    // Snapshot stats
+    if (status.snapshotStats) {
+        snapshotCount.textContent = `${status.snapshotStats.total_snapshots || 0} stored`;
+    }
+
+    // Scheduler status
+    if (status.scheduler) {
+        schedulerStatus.textContent = status.scheduler.isRunning ? '✓ Running' : '○ Stopped';
+        schedulerStatus.className = `value ${status.scheduler.isRunning ? 'success' : 'warning'}`;
+        nextDigest.textContent = status.scheduler.digestTime || '--:--';
+    }
+
+    // Determine setup state
+    const isFullyConfigured = status.configured && status.profileComplete && status.entitiesDiscovered;
+
+    // Show/hide cards based on state
     const setupCard = document.getElementById('setup-card');
+    const actionsCard = document.getElementById('actions-card');
     const digestCard = document.getElementById('digest-card');
-    const startSetupBtn = document.getElementById('start-setup');
 
-    // Determine which setup step we're on
-    let setupStep = 'api'; // Need API key
-    let buttonText = 'Configure API Key First';
-    let buttonDisabled = true;
-    let nextPage = '';
-
-    if (status.configured) {
-        if (!status.profileComplete) {
-            setupStep = 'profile';
-            buttonText = '1. Set Up Profile';
-            buttonDisabled = false;
-            nextPage = '/setup.html';
-        } else if (!status.entitiesDiscovered) {
-            setupStep = 'entities';
-            buttonText = '2. Discover Entities';
-            buttonDisabled = false;
-            nextPage = '/entities.html';
-        } else if (status.entitiesMonitored === 0) {
-            setupStep = 'entities';
-            buttonText = 'Configure Entities';
-            buttonDisabled = false;
-            nextPage = '/entities.html';
-        } else {
-            setupStep = 'complete';
-            buttonText = 'Settings';
-            buttonDisabled = false;
-            nextPage = '/entities.html'; // For now, settings = entities page
-        }
-    }
-
-    startSetupBtn.textContent = buttonText;
-    startSetupBtn.disabled = buttonDisabled;
-
-    // Add click handler for setup button
-    if (nextPage) {
-        startSetupBtn.onclick = () => {
-            window.location.href = nextPage;
-        };
-    }
-
-    // Show/hide cards based on setup state
-    if (setupStep === 'complete') {
+    if (isFullyConfigured) {
         setupCard.classList.add('hidden');
+        actionsCard.classList.remove('hidden');
         digestCard.classList.remove('hidden');
     } else {
         setupCard.classList.remove('hidden');
+        actionsCard.classList.add('hidden');
         digestCard.classList.add('hidden');
+
+        // Update step styling based on progress
+        updateSetupSteps(status);
+    }
+
+    // Enable start setup button
+    const startSetupBtn = document.getElementById('start-setup');
+    if (startSetupBtn) {
+        startSetupBtn.disabled = false;
+
+        if (!status.configured) {
+            startSetupBtn.textContent = '1. Configure API Key';
+            startSetupBtn.disabled = true;
+        } else if (!status.profileComplete) {
+            startSetupBtn.textContent = '2. Set Up Profile';
+            startSetupBtn.onclick = () => { window.location.href = '/setup.html'; };
+        } else if (!status.entitiesDiscovered) {
+            startSetupBtn.textContent = '3. Discover Entities';
+            startSetupBtn.onclick = () => { window.location.href = '/entities.html'; };
+        }
     }
 }
 
+function updateSetupSteps(status) {
+    const step1 = document.getElementById('step-1');
+    const step2 = document.getElementById('step-2');
+    const step3 = document.getElementById('step-3');
 
-
-function showError(message) {
-    const statusGrid = document.getElementById('status-grid');
-    statusGrid.innerHTML = `
-        <div class="status-item" style="grid-column: 1 / -1;">
-            <span class="value not-configured">${message}</span>
-        </div>
-    `;
+    if (status.configured) {
+        step1.classList.add('complete');
+    }
+    if (status.profileComplete) {
+        step2.classList.add('complete');
+    }
+    if (status.entitiesDiscovered) {
+        step3.classList.add('complete');
+    }
 }
 
-// Auto-refresh status every 30 seconds
-setInterval(async () => {
+async function loadDigestStatus() {
     try {
-        const status = await fetchStatus();
-        updateStatusDisplay(status);
-        updateUIState(status);
+        const response = await fetch('/api/digest/status');
+        const data = await response.json();
+
+        if (data.lastDigest) {
+            displayLatestDigest(data.lastDigest);
+        }
+
+        // Load digest history
+        await loadDigestHistory();
     } catch (error) {
-        console.error('Status refresh failed:', error);
+        console.error('Failed to load digest status:', error);
     }
-}, 30000);
+}
+
+function displayLatestDigest(digest) {
+    const digestCard = document.getElementById('digest-card');
+    const digestContent = document.getElementById('digest-content');
+    const digestTimestamp = document.getElementById('digest-timestamp');
+
+    digestCard.classList.remove('hidden');
+
+    if (digest.timestamp) {
+        const date = new Date(digest.timestamp);
+        digestTimestamp.textContent = date.toLocaleString();
+    }
+
+    // If we have the full content, fetch it
+    if (digest.id) {
+        loadFullDigest(digest.id);
+    } else {
+        digestContent.innerHTML = `<p class="digest-summary">${digest.summary || 'No summary available'}</p>`;
+    }
+}
+
+async function loadFullDigest(digestId) {
+    try {
+        const response = await fetch(`/api/digest/${digestId}`);
+        const data = await response.json();
+
+        if (data.digest && data.digest.content) {
+            const digestContent = document.getElementById('digest-content');
+            // Convert markdown to HTML (simple conversion)
+            digestContent.innerHTML = markdownToHtml(data.digest.content);
+        }
+    } catch (error) {
+        console.error('Failed to load full digest:', error);
+    }
+}
+
+async function loadDigestHistory() {
+    try {
+        const response = await fetch('/api/digest/list?limit=5');
+        const data = await response.json();
+
+        if (data.digests && data.digests.length > 1) {
+            const historyCard = document.getElementById('history-card');
+            const digestList = document.getElementById('digest-list');
+
+            historyCard.classList.remove('hidden');
+
+            digestList.innerHTML = data.digests.slice(1).map(digest => `
+                <div class="digest-list-item" onclick="loadFullDigest(${digest.id})">
+                    <span class="digest-date">${new Date(digest.timestamp).toLocaleDateString()}</span>
+                    <span class="digest-summary">${digest.summary || 'No summary'}</span>
+                    <span class="digest-attention ${digest.attention_count > 0 ? 'warning' : ''}">${digest.attention_count} items</span>
+                </div>
+            `).join('');
+        }
+    } catch (error) {
+        console.error('Failed to load digest history:', error);
+    }
+}
+
+async function handleStartSetup() {
+    window.location.href = '/setup.html';
+}
+
+async function handleGenerateDigest() {
+    const btn = document.getElementById('generate-digest');
+    const actionStatus = document.getElementById('action-status');
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Generating...';
+    actionStatus.textContent = 'Calling Gemini AI to analyze your smart home...';
+    actionStatus.className = 'action-status info';
+
+    try {
+        const response = await fetch('/api/digest/generate', { method: 'POST' });
+        const data = await response.json();
+
+        if (data.success) {
+            actionStatus.textContent = '✓ Digest generated successfully!';
+            actionStatus.className = 'action-status success';
+
+            // Reload digest display
+            displayLatestDigest(data.digest);
+            await loadDigestHistory();
+        } else {
+            throw new Error(data.error || 'Failed to generate digest');
+        }
+    } catch (error) {
+        console.error('Generate digest error:', error);
+        actionStatus.textContent = `✗ Error: ${error.message}`;
+        actionStatus.className = 'action-status error';
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '🔄 Generate Digest Now';
+    }
+}
+
+async function handleTestNotification() {
+    const actionStatus = document.getElementById('action-status');
+
+    actionStatus.textContent = 'Sending test notification...';
+    actionStatus.className = 'action-status info';
+
+    try {
+        const response = await fetch('/api/digest/test-notification', { method: 'POST' });
+        const data = await response.json();
+
+        if (data.success) {
+            actionStatus.textContent = '✓ Test notification sent!';
+            actionStatus.className = 'action-status success';
+        } else {
+            throw new Error(data.error || 'Failed to send notification');
+        }
+    } catch (error) {
+        console.error('Test notification error:', error);
+        actionStatus.textContent = `✗ Error: ${error.message}`;
+        actionStatus.className = 'action-status error';
+    }
+}
+
+// Simple markdown to HTML converter
+function markdownToHtml(markdown) {
+    return markdown
+        // Headers
+        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+        // Bold
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        // Italic
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        // Lists
+        .replace(/^\- (.*$)/gim, '<li>$1</li>')
+        // Line breaks
+        .replace(/\n\n/g, '</p><p>')
+        .replace(/\n/g, '<br>')
+        // Wrap in paragraph
+        .replace(/^(.*)$/, '<p>$1</p>')
+        // Horizontal rule
+        .replace(/---/g, '<hr>');
+}

@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Assistant Digest</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <div class="container">
         <header class="header">
             <div class="logo">
                 <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                 </svg>
                 <h1>Home Assistant Digest</h1>
             </div>
@@ -28,43 +31,51 @@
                         <span class="value" id="api-status">Checking...</span>
                     </div>
                     <div class="status-item">
-                        <span class="label">Digest Time</span>
-                        <span class="value" id="digest-time">--:--</span>
+                        <span class="label">Profile</span>
+                        <span class="value" id="profile-status">--</span>
                     </div>
                     <div class="status-item">
-                        <span class="label">History</span>
-                        <span class="value" id="history-days">- days</span>
+                        <span class="label">Entities</span>
+                        <span class="value" id="entities-count">--</span>
                     </div>
                     <div class="status-item">
-                        <span class="label">Monitored</span>
-                        <span class="value" id="entities-count">- entities</span>
+                        <span class="label">Snapshots</span>
+                        <span class="value" id="snapshot-count">--</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Scheduler</span>
+                        <span class="value" id="scheduler-status">--</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Next Digest</span>
+                        <span class="value" id="next-digest">--</span>
                     </div>
                 </div>
             </section>
 
-            <!-- Setup Card (shown when not configured) -->
+            <!-- Setup Card (shown when not fully configured) -->
             <section class="card setup-card" id="setup-card">
                 <h2>Getting Started</h2>
                 <div class="steps">
-                    <div class="step">
+                    <div class="step" id="step-1">
                         <span class="step-number">1</span>
                         <div class="step-content">
                             <h3>Configure API Key</h3>
                             <p>Add your Google Gemini API key in the add-on configuration.</p>
                         </div>
                     </div>
-                    <div class="step">
+                    <div class="step" id="step-2">
                         <span class="step-number">2</span>
                         <div class="step-content">
                             <h3>Set Up Home Profile</h3>
                             <p>Answer a few questions about your home and preferences.</p>
                         </div>
                     </div>
-                    <div class="step">
+                    <div class="step" id="step-3">
                         <span class="step-number">3</span>
                         <div class="step-content">
-                            <h3>Run Assessment</h3>
-                            <p>Let the AI scan your Home Assistant to determine what to monitor.</p>
+                            <h3>Discover Entities</h3>
+                            <p>Scan Home Assistant to select devices to monitor.</p>
                         </div>
                     </div>
                 </div>
@@ -73,12 +84,36 @@
                 </button>
             </section>
 
+            <!-- Digest Actions (shown when configured) -->
+            <section class="card actions-card hidden" id="actions-card">
+                <h2>Actions</h2>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="generate-digest">
+                        🔄 Generate Digest Now
+                    </button>
+                    <button class="btn btn-secondary" id="test-notification">
+                        🔔 Test Notification
+                    </button>
+                </div>
+                <div id="action-status" class="action-status"></div>
+            </section>
+
             <!-- Latest Digest Card (shown when configured) -->
             <section class="card digest-card hidden" id="digest-card">
-                <h2>Latest Digest</h2>
-                <div class="digest-content" id="digest-content">
-                    <p class="empty-state">No digest generated yet. Check back after your scheduled digest time.</p>
+                <div class="digest-header">
+                    <h2>Latest Digest</h2>
+                    <span class="digest-time" id="digest-timestamp"></span>
                 </div>
+                <div class="digest-content" id="digest-content">
+                    <p class="empty-state">No digest generated yet. Click "Generate Digest Now" or wait for your
+                        scheduled time.</p>
+                </div>
+            </section>
+
+            <!-- Past Digests (shown when there are multiple) -->
+            <section class="card history-card hidden" id="history-card">
+                <h2>Past Digests</h2>
+                <div class="digest-list" id="digest-list"></div>
             </section>
         </main>
 
@@ -89,4 +124,5 @@
 
     <script src="app.js"></script>
 </body>
+
 </html>
