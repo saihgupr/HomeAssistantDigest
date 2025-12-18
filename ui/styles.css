@@ -250,9 +250,8 @@ body {
     backdrop-filter: blur(10px);
 }
 
+/* Planet buttons - relatively sized (visual scale, not true scale) */
 .planet-btn {
-    width: 28px;
-    height: 28px;
     border-radius: 50%;
     border: 2px solid transparent;
     cursor: pointer;
@@ -261,90 +260,153 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.planet-btn::before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    transition: transform 0.3s ease;
+    flex-shrink: 0;
 }
 
 .planet-btn:hover {
-    transform: scale(1.2);
+    transform: scale(1.3);
+    z-index: 10;
 }
 
 .planet-btn.active {
-    border-color: var(--planet-color);
-    box-shadow: 0 0 12px var(--planet-color);
+    border-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
 }
 
-/* Planet colors */
+/* ☿ Mercury - Smallest, gray, cratered */
 .planet-btn[data-theme="mercury"] {
-    background: linear-gradient(135deg, #8c8c8c, #5a5a5a);
+    width: 12px;
+    height: 12px;
+    background: radial-gradient(circle at 30% 30%, #a0a0a0, #6a6a6a 60%, #4a4a4a);
+    box-shadow: inset -2px -2px 4px rgba(0, 0, 0, 0.4);
 }
 
+/* ♀ Venus - Slightly larger, hazy yellow-orange */
 .planet-btn[data-theme="venus"] {
-    background: linear-gradient(135deg, #e8c574, #c4a050);
+    width: 18px;
+    height: 18px;
+    background: radial-gradient(circle at 35% 35%, #f5d898, #e8b84a 50%, #c49030);
+    box-shadow:
+        inset -3px -3px 6px rgba(0, 0, 0, 0.3),
+        0 0 8px rgba(232, 184, 74, 0.4);
 }
 
+/* 🜨 Earth - Blue marble with green */
 .planet-btn[data-theme="earth"] {
-    background: linear-gradient(135deg, #4a9eff, #3a6e3a);
+    width: 18px;
+    height: 18px;
+    background:
+        radial-gradient(circle at 60% 30%, rgba(255, 255, 255, 0.3) 0%, transparent 20%),
+        radial-gradient(circle at 35% 35%, #6ab4ff, #4a9eff 40%, #2a6eaa 70%, #1a4e7a);
+    box-shadow:
+        inset -3px -3px 6px rgba(0, 0, 0, 0.3),
+        0 0 6px rgba(74, 158, 255, 0.5);
 }
 
+/* ♂ Mars - Red planet */
 .planet-btn[data-theme="mars"] {
-    background: linear-gradient(135deg, #e85a3a, #8a3020);
+    width: 14px;
+    height: 14px;
+    background: radial-gradient(circle at 30% 30%, #e87a5a, #c85a3a 50%, #8a3020);
+    box-shadow: inset -2px -2px 5px rgba(0, 0, 0, 0.4);
 }
 
+/* ♃ Jupiter - Largest, banded */
 .planet-btn[data-theme="jupiter"] {
-    background: linear-gradient(180deg, #e8a454, #c48040, #e8a454, #9a6830);
+    width: 32px;
+    height: 32px;
+    background:
+        radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.2) 0%, transparent 30%),
+        repeating-linear-gradient(180deg,
+            #e8a454 0%,
+            #d4884a 8%,
+            #f0c080 16%,
+            #c48040 24%,
+            #e8a454 32%);
+    box-shadow: inset -4px -4px 8px rgba(0, 0, 0, 0.3);
 }
 
+/* Great Red Spot hint */
+.planet-btn[data-theme="jupiter"]::before {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 5px;
+    background: #c85a40;
+    border-radius: 50%;
+    bottom: 10px;
+    left: 8px;
+    opacity: 0.7;
+}
+
+/* ♄ Saturn - Ringed beauty */
 .planet-btn[data-theme="saturn"] {
-    background: #d4b070;
-    box-shadow: 0 0 0 3px transparent, 0 0 0 5px rgba(212, 176, 112, 0.5);
+    width: 26px;
+    height: 26px;
+    background: radial-gradient(circle at 35% 35%, #f0dca0, #d4b070 50%, #a08050);
+    box-shadow: inset -3px -3px 6px rgba(0, 0, 0, 0.3);
 }
 
+/* Saturn's iconic ring */
+.planet-btn[data-theme="saturn"]::before {
+    content: '';
+    position: absolute;
+    width: 48px;
+    height: 14px;
+    border: 2px solid transparent;
+    border-top-color: rgba(200, 180, 140, 0.7);
+    border-bottom-color: rgba(200, 180, 140, 0.4);
+    border-radius: 50%;
+    transform: rotate(-15deg);
+    pointer-events: none;
+}
+
+/* ♅ Uranus - Tilted ice giant */
 .planet-btn[data-theme="uranus"] {
-    background: linear-gradient(135deg, #64c8dc, #408090);
-    transform: rotate(-8deg);
+    width: 22px;
+    height: 22px;
+    background: radial-gradient(circle at 40% 40%, #90e0f0, #64c8dc 50%, #408090);
+    box-shadow: inset -3px -3px 6px rgba(0, 0, 0, 0.25);
+    transform: rotate(-82deg);
+    /* Uranus' actual axial tilt! */
 }
 
 .planet-btn[data-theme="uranus"]:hover {
-    transform: rotate(-8deg) scale(1.2);
+    transform: rotate(-82deg) scale(1.3);
 }
 
+/* ♆ Neptune - Deep blue */
 .planet-btn[data-theme="neptune"] {
-    background: linear-gradient(135deg, #5a8adc, #3a5090);
+    width: 21px;
+    height: 21px;
+    background: radial-gradient(circle at 35% 35%, #7aaaec, #5a8adc 50%, #3a5090);
+    box-shadow:
+        inset -3px -3px 6px rgba(0, 0, 0, 0.3),
+        0 0 8px rgba(90, 138, 220, 0.4);
 }
 
+/* 🌌 Void - Pure darkness with single star */
 .planet-btn[data-theme="void"] {
+    width: 20px;
+    height: 20px;
     background: #000;
     border: 1px solid #333;
 }
 
-/* Saturn's ring */
-.planet-btn[data-theme="saturn"]::after {
-    content: '';
+.planet-btn[data-theme="void"]::before {
+    content: '✦';
     position: absolute;
-    width: 40px;
-    height: 10px;
-    border: 2px solid rgba(212, 176, 112, 0.6);
-    border-radius: 50%;
-    transform: rotate(-20deg);
-    pointer-events: none;
+    color: #fff;
+    font-size: 8px;
 }
 
-/* Planet tooltips */
-.planet-btn::after {
-    content: attr(data-name);
+/* Planet name tooltips */
+.planet-label {
     position: absolute;
-    bottom: -24px;
+    bottom: -22px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: var(--text-muted);
     white-space: nowrap;
     opacity: 0;
@@ -352,27 +414,18 @@ body {
     pointer-events: none;
 }
 
-.planet-btn[data-theme="saturn"]::after {
-    content: attr(data-name);
-    width: auto;
-    height: auto;
-    border: none;
-    border-radius: 0;
-    transform: translateX(-50%);
-    bottom: -24px;
-}
-
-.planet-btn:hover::after,
-.planet-btn.active::after {
+.planet-btn:hover .planet-label,
+.planet-btn.active .planet-label {
     opacity: 1;
 }
 
 /* Divider before Void */
 .planet-divider {
     width: 1px;
-    height: 20px;
+    height: 24px;
     background: var(--border);
-    margin: 0 0.5rem;
+    margin: 0 0.75rem;
+    opacity: 0.5;
 }
 
 /* ============================================
@@ -386,14 +439,33 @@ body {
     right: 0;
     bottom: 0;
     pointer-events: none;
-    opacity: 0;
+    opacity: 1;
     transition: opacity 0.5s ease;
     z-index: 0;
 }
 
+/* Brighter stars for deep space themes */
 [data-theme="neptune"] .stars,
 [data-theme="void"] .stars {
     opacity: 1;
+}
+
+[data-theme="neptune"] .stars::before,
+[data-theme="neptune"] .stars::after,
+[data-theme="void"] .stars::before,
+[data-theme="void"] .stars::after {
+    opacity: 1;
+}
+
+/* Subtle stars for other themes */
+[data-theme="mercury"] .stars,
+[data-theme="venus"] .stars,
+[data-theme="earth"] .stars,
+[data-theme="mars"] .stars,
+[data-theme="jupiter"] .stars,
+[data-theme="saturn"] .stars,
+[data-theme="uranus"] .stars {
+    opacity: 0.4;
 }
 
 .stars::before,
