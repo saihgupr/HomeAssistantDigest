@@ -44,25 +44,26 @@ function setTheme(theme) {
 // ============================================
 
 function initLayoutSwitcher() {
-    const savedLayout = localStorage.getItem('ha-digest-layout') || 'monet';
-    setLayout(savedLayout);
+    // Initialize digest type toggle (Daily/Weekly)
+    const savedDigestType = localStorage.getItem('ha-digest-view') || 'daily';
+    setDigestView(savedDigestType);
 
-    document.querySelectorAll('.layout-btn').forEach(btn => {
+    document.querySelectorAll('.layout-btn[data-digest-type]').forEach(btn => {
         btn.addEventListener('click', () => {
-            const layout = btn.dataset.layout;
-            setLayout(layout);
-            localStorage.setItem('ha-digest-layout', layout);
+            const digestType = btn.dataset.digestType;
+            setDigestView(digestType);
+            localStorage.setItem('ha-digest-view', digestType);
         });
     });
 }
 
-function setLayout(layout) {
-    document.documentElement.setAttribute('data-layout', layout);
-
+function setDigestView(digestType) {
     // Update active button
-    document.querySelectorAll('.layout-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.layout === layout);
+    document.querySelectorAll('.layout-btn[data-digest-type]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.digestType === digestType);
     });
+
+    // TODO: Filter digest display by type when implemented
 }
 
 
