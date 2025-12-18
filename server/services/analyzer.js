@@ -51,7 +51,7 @@ async function generateDigest(type = 'daily') {
             }],
             generationConfig: {
                 temperature: 0.4, // Lower temperature for more consistent JSON
-                maxOutputTokens: 4096,
+                maxOutputTokens: 8192,
                 topP: 0.9,
                 responseMimeType: "application/json" // Force JSON mode
             }

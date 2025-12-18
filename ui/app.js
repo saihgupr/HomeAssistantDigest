@@ -320,18 +320,23 @@ async function handleGenerateDigest() {
             const digestCard = document.getElementById('digest-card');
             digestCard.classList.remove('hidden');
 
-            // Update timestamp
+            // Update timestamp (backend returns 'generatedAt', not 'timestamp')
             const digestTimestamp = document.getElementById('digest-timestamp');
-            if (data.digest.timestamp) {
-                const date = new Date(data.digest.timestamp);
+            const timestamp = data.digest.generatedAt || data.digest.timestamp;
+            if (timestamp) {
+                const date = new Date(timestamp);
                 digestTimestamp.textContent = date.toLocaleString();
+            } else {
+                digestTimestamp.textContent = new Date().toLocaleString();
             }
 
             // Render the digest content directly if available
+            const digestGrid = document.getElementById('digest-grid');
+            const digestContent = document.getElementById('digest-content');
+
             if (data.digest.content) {
-                const digestGrid = document.getElementById('digest-grid');
-                const digestContent = document.getElementById('digest-content');
                 digestContent.style.display = 'none';
+                digestGrid.style.display = '';
                 digestGrid.innerHTML = renderDigestCards(data.digest.content);
             } else if (data.digest.id) {
                 // Fallback: fetch full digest by ID
