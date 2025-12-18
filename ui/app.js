@@ -105,7 +105,7 @@ function setupEventListeners() {
 
 async function loadStatus() {
     try {
-        const response = await fetch('/api/status');
+        const response = await fetch('api/status');
         const status = await response.json();
         updateUIState(status);
     } catch (error) {
@@ -208,7 +208,7 @@ function updateSetupSteps(status) {
 
 async function loadDigestStatus() {
     try {
-        const response = await fetch('/api/digest/status');
+        const response = await fetch('api/digest/status');
         const data = await response.json();
 
         if (data.lastDigest) {
@@ -244,7 +244,7 @@ function displayLatestDigest(digest) {
 
 async function loadFullDigest(digestId) {
     try {
-        const response = await fetch(`/api/digest/${digestId}`);
+        const response = await fetch(`api/digest/${digestId}`);
         const data = await response.json();
 
         if (data.digest && data.digest.content) {
@@ -300,7 +300,7 @@ async function handleGenerateDigest() {
     actionStatus.className = 'action-status info';
 
     try {
-        const response = await fetch('/api/digest/generate', { method: 'POST' });
+        const response = await fetch('api/digest/generate', { method: 'POST' });
         const data = await response.json();
 
         if (data.success) {
