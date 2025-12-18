@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function init() {
     initPlanetSwitcher();
+    initLayoutSwitcher();
     updateDateDisplay();
     await loadStatus();
     await loadDigestStatus();
@@ -13,7 +14,7 @@ async function init() {
 }
 
 // ============================================
-// Planet Theme Switcher
+// Planet Theme Switcher (Colors)
 // ============================================
 
 function initPlanetSwitcher() {
@@ -37,6 +38,33 @@ function setTheme(theme) {
         btn.classList.toggle('active', btn.dataset.theme === theme);
     });
 }
+
+// ============================================
+// Layout Style Switcher (Structure)
+// ============================================
+
+function initLayoutSwitcher() {
+    const savedLayout = localStorage.getItem('ha-digest-layout') || 'monet';
+    setLayout(savedLayout);
+
+    document.querySelectorAll('.layout-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const layout = btn.dataset.layout;
+            setLayout(layout);
+            localStorage.setItem('ha-digest-layout', layout);
+        });
+    });
+}
+
+function setLayout(layout) {
+    document.documentElement.setAttribute('data-layout', layout);
+
+    // Update active button
+    document.querySelectorAll('.layout-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.layout === layout);
+    });
+}
+
 
 // ============================================
 // Date Display
