@@ -501,24 +501,28 @@ async function getIntegrationHealthReport() {
             // Count by state
             if (entry.state === 'loaded') {
                 report.loaded++;
+            } else if (entry.state === 'not_loaded' || entry.disabled_by) {
+                // Intentionally disabled/ignored - don't count as failed
+                report.loaded++; // Count as okay
             } else {
                 report.failed++;
 
-                // Add to issues
-                const stateLabels = {
+                // Only add to issues if it's a real error (not intentionally disabled)
+                const errorStates = {
                     'setup_error': 'Setup failed',
                     'setup_retry': 'Retrying setup',
-                    'not_loaded': 'Not loaded',
                     'failed_unload': 'Failed to unload',
                     'migration_error': 'Migration error'
                 };
 
-                report.issues.push({
-                    name: info.title,
-                    domain: entry.domain,
-                    issue: stateLabels[entry.state] || entry.state,
-                    severity: entry.state === 'setup_error' ? 'warning' : 'info'
-                });
+                if (errorStates[entry.state]) {
+                    report.issues.push({
+                        name: info.title,
+                        domain: entry.domain,
+                        issue: errorStates[entry.state],
+                        severity: entry.state === 'setup_error' ? 'warning' : 'info'
+                    });
+                }
             }
 
             report.integrations.push(info);
