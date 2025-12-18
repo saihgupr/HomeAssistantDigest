@@ -7,6 +7,7 @@ const { getSnapshotStats } = require('./db/snapshots');
 const profileRoutes = require('./api/profile');
 const entityRoutes = require('./api/entities');
 const collectorRoutes = require('./api/collector');
+const digestRoutes = require('./api/digest');
 const { startScheduler, getSchedulerStatus } = require('./services/scheduler');
 
 const app = express();
@@ -22,6 +23,7 @@ app.use(express.static(path.join(__dirname, '..', 'ui')));
 app.use('/api/profile', profileRoutes);
 app.use('/api/entities', entityRoutes);
 app.use('/api/collector', collectorRoutes);
+app.use('/api/digest', digestRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
