@@ -116,6 +116,17 @@ function runMigrations() {
     notification_sent INTEGER DEFAULT 0
 )
             `
+        },
+        {
+            name: '005_create_dismissed_warnings',
+            sql: `
+                CREATE TABLE IF NOT EXISTS dismissed_warnings(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    warning_key TEXT UNIQUE NOT NULL,
+    title TEXT,
+    dismissed_at DATETIME DEFAULT CURRENT_TIMESTAMP
+)
+            `
         }
     ];
 

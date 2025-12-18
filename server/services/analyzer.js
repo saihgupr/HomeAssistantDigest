@@ -4,6 +4,7 @@ const { getMonitoredEntities, getEntityStats } = require('../db/entities');
 const { addDigest, getLatestDigest } = require('../db/digests');
 const { getAddonHealthReport, getAutomationHealthReport, getIntegrationHealthReport } = require('./homeassistant');
 const { getBatteryPredictions } = require('./predictions');
+const { getDismissedWarnings } = require('../db/dismissed');
 
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
@@ -66,8 +67,12 @@ async function generateDigest(type = 'daily') {
         console.error('[Digest] Failed to get battery predictions:', error.message);
     }
 
+    // Get dismissed warnings to filter from output
+    const dismissedWarnings = getDismissedWarnings();
+    console.log(`[Digest] ${dismissedWarnings.length} dismissed warnings to filter`);
+
     // Build the prompt
-    const prompt = buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport, automationReport, integrationReport, batteryPredictions);
+    const prompt = buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport, automationReport, integrationReport, batteryPredictions, dismissedWarnings);
 
     // Call Gemini API
     const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
@@ -127,7 +132,7 @@ async function generateDigest(type = 'daily') {
 /**
  * Build the analysis prompt for Gemini
  */
-function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport = null, automationReport = null, integrationReport = null, batteryPredictions = []) {
+function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport = null, automationReport = null, integrationReport = null, batteryPredictions = [], dismissedWarnings = []) {
     const periodLabel = type === 'weekly' ? 'past week' : 'past 24 hours';
 
     // Detect first-run scenario (no snapshot data yet)
@@ -289,6 +294,11 @@ Ensure the "attention_items" array is empty if there are no issues. Be VERY stri
 - Normal operating conditions are not issues - only flag actual malfunctions or critical thresholds
 - Don't be alarmist about minor variations or things that are "lower than others" but still healthy
 - Only include attention_items for things that genuinely need user action NOW
+${dismissedWarnings.length > 0 ? `
+## DISMISSED WARNINGS - DO NOT INCLUDE THESE:
+The user has dismissed the following warnings. DO NOT include any attention_items with these titles or similar topics:
+${dismissedWarnings.map(d => `- "${d.title}"`).join('\n')}
+` : ''}
 ${isFirstRun ? 'Since this is the first run with no data yet, attention_items should be EMPTY and the tone should be welcoming.' : ''}
 Do NOT include markdown formatting in the JSON. Return ONLY raw JSON.`;
 

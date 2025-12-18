@@ -923,6 +923,28 @@ body {
     margin-bottom: 0.25rem;
 }
 
+.digest-card-header .dismiss-btn {
+    margin-left: auto;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0;
+}
+
+.digest-card-item:hover .dismiss-btn {
+    opacity: 1;
+}
+
+.dismiss-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--text-primary);
+}
+
 .digest-card-icon {
     width: 24px;
     height: 24px;

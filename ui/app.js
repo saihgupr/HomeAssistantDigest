@@ -461,17 +461,56 @@ function renderDigestCards(digestData) {
 function createDigestCard({ type, icon, title, desc, footer }) {
     const iconSvg = getIconSvg(icon);
 
+    // Add dismiss button for attention/warning cards
+    const dismissBtn = (type === 'attention')
+        ? `<button class="dismiss-btn" onclick="dismissWarning('${title.replace(/'/g, "\\'")}')">Dismiss</button>`
+        : '';
+
     return `
     <div class="digest-card-item digest-card-${type}">
         <div class="digest-card-header">
             <div class="digest-card-icon">${iconSvg}</div>
             <div class="digest-card-title">${title}</div>
+            ${dismissBtn}
         </div>
         <div class="digest-card-desc">${desc}</div>
         ${footer ? `<div class="digest-card-footer">${footer}</div>` : ''}
     </div>
     `;
 }
+
+/**
+ * Dismiss a warning so it won't appear in future digests
+ */
+async function dismissWarning(title) {
+    try {
+        const response = await fetch('api/digest/dismiss', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // Remove the card from the UI
+            const cards = document.querySelectorAll('.digest-card-item');
+            cards.forEach(card => {
+                const cardTitle = card.querySelector('.digest-card-title');
+                if (cardTitle && cardTitle.textContent === title) {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateX(20px)';
+                    setTimeout(() => card.remove(), 300);
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Failed to dismiss warning:', error);
+    }
+}
+
+// Make dismissWarning available globally
+window.dismissWarning = dismissWarning;
 
 function getIconSvg(name) {
     const icons = {

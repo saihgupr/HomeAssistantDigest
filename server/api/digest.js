@@ -118,4 +118,66 @@ router.post('/test-notification', async (req, res) => {
     }
 });
 
+// ============================================
+// Dismissed Warnings Routes
+// ============================================
+
+const { dismissWarning, getDismissedWarnings, restoreWarning, generateWarningKey } = require('../db/dismissed');
+
+/**
+ * POST /api/digest/dismiss
+ * Dismiss a warning so it won't appear in future digests
+ */
+router.post('/dismiss', (req, res) => {
+    try {
+        const { title } = req.body;
+
+        if (!title) {
+            return res.status(400).json({ error: 'Title is required' });
+        }
+
+        const warningKey = generateWarningKey(title);
+        dismissWarning(warningKey, title);
+
+        res.json({ success: true, warningKey });
+    } catch (error) {
+        console.error('Dismiss warning error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+/**
+ * GET /api/digest/dismissed
+ * Get list of dismissed warnings
+ */
+router.get('/dismissed', (req, res) => {
+    try {
+        const dismissed = getDismissedWarnings();
+        res.json({ dismissed });
+    } catch (error) {
+        console.error('Get dismissed warnings error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+/**
+ * POST /api/digest/restore
+ * Restore a dismissed warning
+ */
+router.post('/restore', (req, res) => {
+    try {
+        const { warningKey } = req.body;
+
+        if (!warningKey) {
+            return res.status(400).json({ error: 'warningKey is required' });
+        }
+
+        restoreWarning(warningKey);
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Restore warning error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports = router;
