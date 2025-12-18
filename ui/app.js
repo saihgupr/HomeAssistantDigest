@@ -148,7 +148,7 @@ function updateUIState(status) {
         nextDigest.textContent = status.scheduler.digestTime || '--:--';
     }
 
-    // Determine setup state
+    // Simplified: fully configured = API key + profile done (entities auto-configure)
     const isFullyConfigured = status.configured && status.profileComplete && status.entitiesDiscovered;
 
     // Show/hide cards based on state
@@ -169,7 +169,7 @@ function updateUIState(status) {
         updateSetupSteps(status);
     }
 
-    // Enable start setup button
+    // Enable start setup button - simplified 2-step flow
     const startSetupBtn = document.getElementById('start-setup');
     if (startSetupBtn) {
         startSetupBtn.disabled = false;
@@ -180,9 +180,21 @@ function updateUIState(status) {
         } else if (!status.profileComplete) {
             startSetupBtn.textContent = 'Set Up Profile';
             startSetupBtn.onclick = () => { window.location.href = 'setup.html'; };
-        } else if (!status.entitiesDiscovered) {
-            startSetupBtn.textContent = 'Discover Entities';
-            startSetupBtn.onclick = () => { window.location.href = 'entities.html'; };
+        } else {
+            // Profile complete but entities not discovered - trigger auto-configure
+            startSetupBtn.textContent = 'Finish Setup';
+            startSetupBtn.onclick = async () => {
+                startSetupBtn.disabled = true;
+                startSetupBtn.textContent = 'Configuring...';
+                try {
+                    await fetch('api/entities/auto-configure', { method: 'POST' });
+                    window.location.reload();
+                } catch (e) {
+                    console.error('Auto-configure failed:', e);
+                    startSetupBtn.disabled = false;
+                    startSetupBtn.textContent = 'Retry Setup';
+                }
+            };
         }
     }
 }
@@ -190,16 +202,12 @@ function updateUIState(status) {
 function updateSetupSteps(status) {
     const step1 = document.getElementById('step-1');
     const step2 = document.getElementById('step-2');
-    const step3 = document.getElementById('step-3');
 
     if (status.configured) {
         step1.classList.add('complete');
     }
     if (status.profileComplete) {
         step2.classList.add('complete');
-    }
-    if (status.entitiesDiscovered) {
-        step3.classList.add('complete');
     }
 }
 
@@ -308,13 +316,29 @@ async function handleGenerateDigest() {
             actionStatus.textContent = 'Digest generated successfully!';
             actionStatus.className = 'action-status success';
 
-            // Reload digest display
-            displayLatestDigest(data.digest);
-            // Trigger full render because displayLatestDigest only sets timestamp if ID present
-            if (data.digest.id) {
-                loadFullDigest(data.digest.id);
+            // Make sure digest card is visible
+            const digestCard = document.getElementById('digest-card');
+            digestCard.classList.remove('hidden');
+
+            // Update timestamp
+            const digestTimestamp = document.getElementById('digest-timestamp');
+            if (data.digest.timestamp) {
+                const date = new Date(data.digest.timestamp);
+                digestTimestamp.textContent = date.toLocaleString();
             }
 
+            // Render the digest content directly if available
+            if (data.digest.content) {
+                const digestGrid = document.getElementById('digest-grid');
+                const digestContent = document.getElementById('digest-content');
+                digestContent.style.display = 'none';
+                digestGrid.innerHTML = renderDigestCards(data.digest.content);
+            } else if (data.digest.id) {
+                // Fallback: fetch full digest by ID
+                await loadFullDigest(data.digest.id);
+            }
+
+            // Reload history
             await loadDigestHistory();
         } else {
             throw new Error(data.error || 'Failed to generate digest');

@@ -99,6 +99,59 @@ router.get('/discover', async (req, res) => {
 });
 
 /**
+ * POST /api/entities/auto-configure
+ * Automatically discover and save all entities with sensible defaults
+ * This is the "magic" one-click setup - no manual selection needed
+ */
+router.post('/auto-configure', async (req, res) => {
+    try {
+        console.log('[Auto-Configure] Starting automatic entity configuration...');
+        const states = await getAllStates();
+
+        // Filter and categorize entities (same as discover)
+        const entities = states
+            .filter(entity => {
+                const domain = entity.entity_id.split('.')[0];
+                if (EXCLUDED_DOMAINS.includes(domain)) return false;
+                if (PRIVACY_EXCLUDED_DOMAINS.includes(domain)) return false;
+                if (entity.state === 'unavailable') return false;
+                return true;
+            })
+            .map(entity => {
+                const domain = entity.entity_id.split('.')[0];
+                const category = categorizeEntity(entity);
+                return {
+                    entity_id: entity.entity_id,
+                    friendly_name: entity.attributes?.friendly_name || entity.entity_id,
+                    domain,
+                    category,
+                    // AI will determine what's important - everything is "normal" by default
+                    priority: determinePriority(entity, category),
+                    storage_strategy: determineStorageStrategy(entity),
+                    state: entity.state
+                };
+            });
+
+        // Clear existing and save all entities
+        clearMonitoredEntities();
+        setMonitoredEntities(entities);
+
+        const stats = getTotalCounts();
+        console.log(`[Auto-Configure] Saved ${entities.length} entities (${stats.monitored} monitored)`);
+
+        res.json({
+            success: true,
+            total: entities.length,
+            monitored: stats.monitored,
+            message: `Auto-configured ${entities.length} entities for monitoring`
+        });
+    } catch (error) {
+        console.error('Auto-configure failed:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+/**
  * POST /api/entities/save
  * Save discovered entities to the database
  */

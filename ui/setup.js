@@ -247,6 +247,7 @@ async function saveProfile() {
     nextBtn.textContent = 'Saving...';
 
     try {
+        // Step 1: Save profile
         const response = await fetch('api/profile', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -257,7 +258,21 @@ async function saveProfile() {
             throw new Error('Failed to save profile');
         }
 
-        // Redirect to main page
+        // Step 2: Auto-configure entities (no manual selection needed!)
+        nextBtn.textContent = 'Configuring entities...';
+        const configResponse = await fetch('api/entities/auto-configure', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!configResponse.ok) {
+            console.warn('Auto-configure failed, but profile saved. User can retry from dashboard.');
+        } else {
+            const result = await configResponse.json();
+            console.log(`Auto-configured ${result.total} entities`);
+        }
+
+        // Redirect to main page - setup complete!
         window.location.href = 'index.html';
     } catch (error) {
         console.error('Failed to save profile:', error);
