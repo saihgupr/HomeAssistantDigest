@@ -244,7 +244,7 @@ body {
     border-bottom: 1px solid var(--border);
     padding: 0.75rem 1.5rem;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     backdrop-filter: blur(10px);
 }
@@ -256,12 +256,12 @@ body {
 }
 
 .theme-badge {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    padding: 0.25rem 0.6rem;
-    border-radius: 4px;
+    letter-spacing: 0.08em;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
     background: rgba(255, 255, 255, 0.05);
     color: var(--text-secondary);
 }
@@ -278,7 +278,8 @@ body {
 
 .theme-divider {
     color: var(--text-muted);
-    opacity: 0.5;
+    opacity: 0.3;
+    font-size: 0.5rem;
 }
 
 .digest-type-slider {
