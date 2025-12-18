@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function init() {
-    initThemeSwitcher();
+    initPlanetSwitcher();
     updateDateDisplay();
     await loadStatus();
     await loadDigestStatus();
@@ -13,14 +13,14 @@ async function init() {
 }
 
 // ============================================
-// Theme Switcher
+// Planet Theme Switcher
 // ============================================
 
-function initThemeSwitcher() {
-    const savedTheme = localStorage.getItem('ha-digest-theme') || 'observatory';
+function initPlanetSwitcher() {
+    const savedTheme = localStorage.getItem('ha-digest-theme') || 'neptune';
     setTheme(savedTheme);
 
-    document.querySelectorAll('.theme-btn').forEach(btn => {
+    document.querySelectorAll('.planet-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const theme = btn.dataset.theme;
             setTheme(theme);
@@ -33,7 +33,7 @@ function setTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
 
     // Update active button
-    document.querySelectorAll('.theme-btn').forEach(btn => {
+    document.querySelectorAll('.planet-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.theme === theme);
     });
 }

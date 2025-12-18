@@ -1,6 +1,6 @@
 /* ============================================
-   Home Assistant Digest - Theme System
-   4 Themes: morning-pages, observatory, monet, home-base
+   Home Assistant Digest - Planetary Theme System
+   9 Themes based on our solar system
    ============================================ */
 
 /* Base Reset */
@@ -11,96 +11,206 @@
 }
 
 /* ============================================
-   Theme Variables
+   PLANETARY THEMES
    ============================================ */
 
-/* Theme A: Morning Pages (Editorial) */
-[data-theme="morning-pages"] {
-    --bg-primary: #faf8f5;
-    --bg-secondary: #f5f2ed;
-    --bg-card: #ffffff;
-    --text-primary: #1a1a1a;
-    --text-secondary: #5a5a5a;
-    --text-muted: #8a8a8a;
-    --accent: #a63d3d;
-    --accent-hover: #8a3232;
-    --success: #3d5a4c;
-    --warning: #b8860b;
-    --danger: #a63d3d;
-    --border: #e5e2dd;
-    --border-strong: #1a1a1a;
-    --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-    --radius: 2px;
-    --font-heading: 'Playfair Display', Georgia, serif;
-    --font-body: 'Source Sans Pro', -apple-system, sans-serif;
-    --stars-opacity: 0;
+/* ☿ MERCURY - Scorched, metallic, minimal, fast */
+[data-theme="mercury"] {
+    --bg-primary: #1a1814;
+    --bg-secondary: #252220;
+    --bg-card: #2d2a27;
+    --text-primary: #e8e4dc;
+    --text-secondary: #a89e94;
+    --text-muted: #6e6660;
+    --accent: #c4a574;
+    --accent-hover: #d4b584;
+    --success: #a4b474;
+    --warning: #c4a574;
+    --danger: #c47474;
+    --border: #3d3a37;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    --radius: 4px;
+    --font-heading: 'SF Mono', 'Fira Code', monospace;
+    --font-body: 'Inter', -apple-system, sans-serif;
+    --planet-color: #8c8c8c;
+    --atmosphere: none;
 }
 
-/* Theme B: Observatory (Night Watch) */
-[data-theme="observatory"] {
+/* ♀ VENUS - Hazy, sulfurous, mysterious, warm */
+[data-theme="venus"] {
+    --bg-primary: #1f1a14;
+    --bg-secondary: #2a2318;
+    --bg-card: rgba(255, 200, 100, 0.08);
+    --text-primary: #f5e6d0;
+    --text-secondary: #c4a880;
+    --text-muted: #8a7860;
+    --accent: #e8b84a;
+    --accent-hover: #f0c85a;
+    --success: #b8c84a;
+    --warning: #e8b84a;
+    --danger: #e87a4a;
+    --border: rgba(232, 184, 74, 0.2);
+    --shadow: 0 8px 32px rgba(232, 184, 74, 0.15);
+    --radius: 20px;
+    --font-heading: 'Crimson Pro', Georgia, serif;
+    --font-body: 'Inter', -apple-system, sans-serif;
+    --planet-color: #e8c574;
+    --atmosphere: blur(3px);
+}
+
+/* 🜨 EARTH - Familiar, comfortable, home */
+[data-theme="earth"] {
+    --bg-primary: #0f1419;
+    --bg-secondary: #1a2027;
+    --bg-card: #232b35;
+    --text-primary: #e8f0f5;
+    --text-secondary: #8ca4b8;
+    --text-muted: #5a7080;
+    --accent: #4a9eff;
+    --accent-hover: #6ab4ff;
+    --success: #4acf7a;
+    --warning: #ffaa4a;
+    --danger: #ff5a5a;
+    --border: #2d3842;
+    --shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    --radius: 12px;
+    --font-heading: -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, sans-serif;
+    --planet-color: #4a9eff;
+    --atmosphere: none;
+}
+
+/* ♂ MARS - Dusty, industrial, frontier, exploration */
+[data-theme="mars"] {
+    --bg-primary: #1a1210;
+    --bg-secondary: #251a16;
+    --bg-card: #2f211c;
+    --text-primary: #f0dcd4;
+    --text-secondary: #b89484;
+    --text-muted: #7a5a4a;
+    --accent: #e85a3a;
+    --accent-hover: #f06a4a;
+    --success: #8aaa5a;
+    --warning: #e8a43a;
+    --danger: #e85a3a;
+    --border: #4a322a;
+    --shadow: 0 4px 20px rgba(150, 50, 30, 0.2);
+    --radius: 6px;
+    --font-heading: 'Inter', -apple-system, sans-serif;
+    --font-body: 'Inter', -apple-system, sans-serif;
+    --planet-color: #e85a3a;
+    --atmosphere: none;
+}
+
+/* ♃ JUPITER - Bold, massive, stormy, powerful */
+[data-theme="jupiter"] {
+    --bg-primary: #14120f;
+    --bg-secondary: #1e1a15;
+    --bg-card: linear-gradient(180deg, #2a2318 0%, #1e1a15 50%, #2a2520 100%);
+    --text-primary: #f5ece0;
+    --text-secondary: #c4b090;
+    --text-muted: #8a7a60;
+    --accent: #e8a454;
+    --accent-hover: #f0b464;
+    --success: #8ab454;
+    --warning: #e8a454;
+    --danger: #e86454;
+    --border: #3a3025;
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --radius: 16px;
+    --font-heading: 'Playfair Display', Georgia, serif;
+    --font-body: 'Source Sans Pro', -apple-system, sans-serif;
+    --planet-color: #e8a454;
+    --atmosphere: none;
+}
+
+/* ♄ SATURN - Elegant, golden, ringed, luxurious */
+[data-theme="saturn"] {
+    --bg-primary: #12100d;
+    --bg-secondary: #1a1712;
+    --bg-card: #22201a;
+    --text-primary: #f5f0e5;
+    --text-secondary: #c4b898;
+    --text-muted: #8a8068;
+    --accent: #d4b070;
+    --accent-hover: #e4c080;
+    --success: #90b870;
+    --warning: #d4b070;
+    --danger: #d47070;
+    --border: #3a3528;
+    --shadow: 0 4px 24px rgba(212, 176, 112, 0.1);
+    --radius: 24px;
+    --font-heading: 'Playfair Display', Georgia, serif;
+    --font-body: 'Inter', -apple-system, sans-serif;
+    --planet-color: #d4b070;
+    --atmosphere: none;
+}
+
+/* ♅ URANUS - Icy, tilted, unusual, cyan */
+[data-theme="uranus"] {
+    --bg-primary: #0a1214;
+    --bg-secondary: #101a1e;
+    --bg-card: rgba(100, 200, 220, 0.06);
+    --text-primary: #e0f5f8;
+    --text-secondary: #80c4d0;
+    --text-muted: #508090;
+    --accent: #64c8dc;
+    --accent-hover: #84d8ec;
+    --success: #64dc98;
+    --warning: #dcc864;
+    --danger: #dc6464;
+    --border: rgba(100, 200, 220, 0.15);
+    --shadow: 0 8px 32px rgba(100, 200, 220, 0.1);
+    --radius: 8px;
+    --font-heading: 'Inter', -apple-system, sans-serif;
+    --font-body: 'Inter', -apple-system, sans-serif;
+    --planet-color: #64c8dc;
+    --atmosphere: blur(2px);
+    --tilt: -8deg;
+}
+
+/* ♆ NEPTUNE - Deep, mysterious, windy, distant */
+[data-theme="neptune"] {
     --bg-primary: #0a0f1a;
     --bg-secondary: #0f1520;
     --bg-card: #141c2a;
     --text-primary: #e8e4df;
     --text-secondary: #a8a4a0;
     --text-muted: #6a6862;
-    --accent: #e8a854;
-    --accent-hover: #f0b864;
+    --accent: #5a8adc;
+    --accent-hover: #7aa0ec;
     --success: #54b87a;
-    --warning: #e8a854;
-    --danger: #e85454;
+    --warning: #dcaa5a;
+    --danger: #dc5a5a;
     --border: #1e2838;
-    --border-strong: #3a4858;
-    --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    --radius: 8px;
+    --shadow: 0 4px 20px rgba(90, 138, 220, 0.15);
+    --radius: 10px;
     --font-heading: 'Inter', -apple-system, sans-serif;
     --font-body: 'Inter', -apple-system, sans-serif;
-    --stars-opacity: 1;
+    --planet-color: #5a8adc;
+    --atmosphere: none;
 }
 
-/* Theme C: Monet's Morning (Impressionist) */
-[data-theme="monet"] {
-    --bg-primary: #1a1e2e;
-    --bg-secondary: #242840;
-    --bg-card: rgba(255, 255, 255, 0.05);
-    --text-primary: #f0eef5;
-    --text-secondary: #b8b4c8;
-    --text-muted: #7a7690;
-    --accent: #d4a5a5;
-    --accent-hover: #e4b5b5;
-    --success: #a5c4a5;
-    --warning: #d4c4a5;
-    --danger: #d4a5a5;
-    --border: rgba(255, 255, 255, 0.08);
-    --border-strong: rgba(255, 255, 255, 0.15);
-    --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    --radius: 16px;
-    --font-heading: 'Crimson Pro', Georgia, serif;
-    --font-body: 'Inter', -apple-system, sans-serif;
-    --stars-opacity: 0;
-    --blur: blur(20px);
-}
-
-/* Theme D: Home Base (HA Native) */
-[data-theme="home-base"] {
-    --bg-primary: #1c1c1c;
-    --bg-secondary: #252525;
-    --bg-card: #303030;
-    --text-primary: #e1e1e1;
-    --text-secondary: #a1a1a1;
-    --text-muted: #717171;
-    --accent: #03a9f4;
-    --accent-hover: #29b6f6;
-    --success: #4caf50;
-    --warning: #ff9800;
-    --danger: #f44336;
-    --border: #404040;
-    --border-strong: #505050;
-    --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    --radius: 12px;
-    --font-heading: -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-body: -apple-system, BlinkMacSystemFont, sans-serif;
-    --stars-opacity: 0;
+/* 🌌 VOID - Pure space, stars, minimal */
+[data-theme="void"] {
+    --bg-primary: #000000;
+    --bg-secondary: #0a0a0a;
+    --bg-card: #111111;
+    --text-primary: #ffffff;
+    --text-secondary: #888888;
+    --text-muted: #555555;
+    --accent: #ffffff;
+    --accent-hover: #dddddd;
+    --success: #88ff88;
+    --warning: #ffdd88;
+    --danger: #ff8888;
+    --border: #222222;
+    --shadow: none;
+    --radius: 0;
+    --font-heading: 'SF Mono', 'Fira Code', monospace;
+    --font-body: 'SF Mono', 'Fira Code', monospace;
+    --planet-color: #ffffff;
+    --atmosphere: none;
 }
 
 /* ============================================
@@ -113,7 +223,7 @@ body {
     color: var(--text-primary);
     line-height: 1.6;
     min-height: 100vh;
-    transition: background 0.3s ease, color 0.3s ease;
+    transition: background 0.4s ease, color 0.3s ease;
 }
 
 .container {
@@ -123,47 +233,150 @@ body {
 }
 
 /* ============================================
-   Theme Selector Bar
+   Planet Selector Bar (Orbital Style)
    ============================================ */
 
-.theme-bar {
+.planet-bar {
     position: sticky;
     top: 0;
     z-index: 100;
     background: var(--bg-secondary);
     border-bottom: 1px solid var(--border);
-    padding: 0.75rem 1.5rem;
+    padding: 1rem 1.5rem;
     display: flex;
     justify-content: center;
-    gap: 0.5rem;
+    align-items: center;
+    gap: 0.75rem;
     backdrop-filter: blur(10px);
 }
 
-.theme-btn {
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text-secondary);
-    font-family: var(--font-body);
-    font-size: 0.85rem;
+.planet-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid transparent;
     cursor: pointer;
-    transition: all 0.2s ease;
-    border-radius: var(--radius);
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.theme-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
+.planet-btn::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
 }
 
-.theme-btn.active {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--bg-primary);
+.planet-btn:hover {
+    transform: scale(1.2);
+}
+
+.planet-btn.active {
+    border-color: var(--planet-color);
+    box-shadow: 0 0 12px var(--planet-color);
+}
+
+/* Planet colors */
+.planet-btn[data-theme="mercury"] {
+    background: linear-gradient(135deg, #8c8c8c, #5a5a5a);
+}
+
+.planet-btn[data-theme="venus"] {
+    background: linear-gradient(135deg, #e8c574, #c4a050);
+}
+
+.planet-btn[data-theme="earth"] {
+    background: linear-gradient(135deg, #4a9eff, #3a6e3a);
+}
+
+.planet-btn[data-theme="mars"] {
+    background: linear-gradient(135deg, #e85a3a, #8a3020);
+}
+
+.planet-btn[data-theme="jupiter"] {
+    background: linear-gradient(180deg, #e8a454, #c48040, #e8a454, #9a6830);
+}
+
+.planet-btn[data-theme="saturn"] {
+    background: #d4b070;
+    box-shadow: 0 0 0 3px transparent, 0 0 0 5px rgba(212, 176, 112, 0.5);
+}
+
+.planet-btn[data-theme="uranus"] {
+    background: linear-gradient(135deg, #64c8dc, #408090);
+    transform: rotate(-8deg);
+}
+
+.planet-btn[data-theme="uranus"]:hover {
+    transform: rotate(-8deg) scale(1.2);
+}
+
+.planet-btn[data-theme="neptune"] {
+    background: linear-gradient(135deg, #5a8adc, #3a5090);
+}
+
+.planet-btn[data-theme="void"] {
+    background: #000;
+    border: 1px solid #333;
+}
+
+/* Saturn's ring */
+.planet-btn[data-theme="saturn"]::after {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 10px;
+    border: 2px solid rgba(212, 176, 112, 0.6);
+    border-radius: 50%;
+    transform: rotate(-20deg);
+    pointer-events: none;
+}
+
+/* Planet tooltips */
+.planet-btn::after {
+    content: attr(data-name);
+    position: absolute;
+    bottom: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+
+.planet-btn[data-theme="saturn"]::after {
+    content: attr(data-name);
+    width: auto;
+    height: auto;
+    border: none;
+    border-radius: 0;
+    transform: translateX(-50%);
+    bottom: -24px;
+}
+
+.planet-btn:hover::after,
+.planet-btn.active::after {
+    opacity: 1;
+}
+
+/* Divider before Void */
+.planet-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+    margin: 0 0.5rem;
 }
 
 /* ============================================
-   Stars Background (Observatory theme)
+   Stars Background (for space themes)
    ============================================ */
 
 .stars {
@@ -173,9 +386,14 @@ body {
     right: 0;
     bottom: 0;
     pointer-events: none;
-    opacity: var(--stars-opacity);
+    opacity: 0;
     transition: opacity 0.5s ease;
     z-index: 0;
+}
+
+[data-theme="neptune"] .stars,
+[data-theme="void"] .stars {
+    opacity: 1;
 }
 
 .stars::before,
@@ -187,24 +405,30 @@ body {
     background: white;
     border-radius: 50%;
     box-shadow:
-        50px 100px 0 rgba(255, 255, 255, 0.3),
+        50px 100px 0 rgba(255, 255, 255, 0.4),
         150px 50px 0 rgba(255, 255, 255, 0.2),
-        250px 150px 0 rgba(255, 255, 255, 0.4),
-        350px 80px 0 rgba(255, 255, 255, 0.2),
-        450px 200px 0 rgba(255, 255, 255, 0.3),
+        250px 150px 0 rgba(255, 255, 255, 0.5),
+        350px 80px 0 rgba(255, 255, 255, 0.3),
+        450px 200px 0 rgba(255, 255, 255, 0.4),
         100px 250px 0 rgba(255, 255, 255, 0.2),
-        200px 300px 0 rgba(255, 255, 255, 0.3),
-        300px 350px 0 rgba(255, 255, 255, 0.2),
-        400px 400px 0 rgba(255, 255, 255, 0.4),
+        200px 300px 0 rgba(255, 255, 255, 0.4),
+        300px 350px 0 rgba(255, 255, 255, 0.3),
+        400px 400px 0 rgba(255, 255, 255, 0.5),
         500px 450px 0 rgba(255, 255, 255, 0.2),
-        600px 100px 0 rgba(255, 255, 255, 0.3),
-        700px 200px 0 rgba(255, 255, 255, 0.2),
-        800px 300px 0 rgba(255, 255, 255, 0.3);
+        600px 100px 0 rgba(255, 255, 255, 0.4),
+        700px 200px 0 rgba(255, 255, 255, 0.3),
+        800px 300px 0 rgba(255, 255, 255, 0.4),
+        550px 80px 0 rgba(255, 255, 255, 0.2),
+        650px 180px 0 rgba(255, 255, 255, 0.3),
+        750px 280px 0 rgba(255, 255, 255, 0.2),
+        180px 420px 0 rgba(255, 255, 255, 0.3),
+        280px 520px 0 rgba(255, 255, 255, 0.2),
+        380px 620px 0 rgba(255, 255, 255, 0.4);
 }
 
 .stars::after {
     transform: translateX(100px) translateY(50px);
-    opacity: 0.5;
+    opacity: 0.7;
 }
 
 /* ============================================
@@ -240,24 +464,23 @@ body {
     color: var(--text-primary);
 }
 
-/* Morning Pages: Editorial styling */
-[data-theme="morning-pages"] .logo h1 {
+/* Theme-specific header styles */
+[data-theme="mercury"] .logo h1,
+[data-theme="void"] .logo h1 {
     font-weight: 400;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
 }
 
-/* Observatory: Calm styling */
-[data-theme="observatory"] .logo h1 {
-    font-weight: 500;
-    letter-spacing: 0.02em;
-}
-
-/* Monet: Soft styling */
-[data-theme="monet"] .logo h1 {
+[data-theme="venus"] .logo h1 {
     font-weight: 300;
     font-style: italic;
+}
+
+[data-theme="jupiter"] .logo h1,
+[data-theme="saturn"] .logo h1 {
+    font-weight: 500;
 }
 
 .tagline {
@@ -269,17 +492,6 @@ body {
     color: var(--text-secondary);
     font-size: 0.9rem;
     margin-top: 0.5rem;
-}
-
-/* Morning Pages: Date separator */
-[data-theme="morning-pages"] .date-display {
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    padding: 0.5rem 0;
-    margin-top: 1rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    font-size: 0.8rem;
 }
 
 /* ============================================
@@ -298,18 +510,26 @@ body {
     transition: all 0.3s ease;
 }
 
-/* Monet: Frosted glass effect */
-[data-theme="monet"] .card {
-    backdrop-filter: var(--blur);
-    -webkit-backdrop-filter: var(--blur);
+/* Venus & Uranus: Frosted glass */
+[data-theme="venus"] .card,
+[data-theme="uranus"] .card {
+    backdrop-filter: var(--atmosphere);
+    -webkit-backdrop-filter: var(--atmosphere);
 }
 
-/* Morning Pages: Sharp, editorial */
-[data-theme="morning-pages"] .card {
-    border: none;
-    border-top: 2px solid var(--border-strong);
+/* Mercury & Void: Sharp, minimal */
+[data-theme="mercury"] .card,
+[data-theme="void"] .card {
     border-radius: 0;
-    box-shadow: none;
+}
+
+/* Uranus: Slight tilt */
+[data-theme="uranus"] .card {
+    transform: rotate(var(--tilt, 0deg));
+}
+
+[data-theme="uranus"] .card:hover {
+    transform: rotate(0deg);
 }
 
 .card h2 {
@@ -318,16 +538,6 @@ body {
     font-weight: 600;
     margin-bottom: 1rem;
     color: var(--text-primary);
-}
-
-/* Morning Pages: Underlined headers */
-[data-theme="morning-pages"] .card h2 {
-    font-weight: 400;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 0.5rem;
 }
 
 /* ============================================
@@ -403,12 +613,10 @@ body {
     flex-shrink: 0;
 }
 
-/* Morning Pages: Square numbers */
-[data-theme="morning-pages"] .step-number {
+/* Mercury/Void: Square numbers */
+[data-theme="mercury"] .step-number,
+[data-theme="void"] .step-number {
     border-radius: 0;
-    background: var(--text-primary);
-    color: var(--bg-primary);
-    border: none;
 }
 
 .step.complete .step-number {
@@ -449,7 +657,7 @@ body {
 
 .btn-primary {
     background: var(--accent);
-    color: white;
+    color: var(--bg-primary);
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -457,19 +665,16 @@ body {
     transform: translateY(-1px);
 }
 
-/* Morning Pages: Text-style buttons */
-[data-theme="morning-pages"] .btn-primary {
+/* Void: Outline buttons */
+[data-theme="void"] .btn-primary {
     background: transparent;
     color: var(--accent);
-    border: 2px solid var(--accent);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-size: 0.8rem;
+    border: 1px solid var(--accent);
 }
 
-[data-theme="morning-pages"] .btn-primary:hover {
+[data-theme="void"] .btn-primary:hover {
     background: var(--accent);
-    color: white;
+    color: var(--bg-primary);
 }
 
 .btn-secondary {
@@ -507,7 +712,7 @@ body {
 }
 
 .action-status.info {
-    background: rgba(var(--accent), 0.1);
+    background: rgba(100, 150, 255, 0.1);
     border: 1px solid var(--accent);
     color: var(--accent);
 }
@@ -519,7 +724,7 @@ body {
 }
 
 .action-status.error {
-    background: rgba(232, 84, 84, 0.1);
+    background: rgba(220, 90, 90, 0.1);
     border: 1px solid var(--danger);
     color: var(--danger);
 }
@@ -552,8 +757,6 @@ body {
     font-size: 1.1rem;
     margin: 1.5rem 0 0.75rem;
     color: var(--text-primary);
-    border-bottom: none;
-    padding-bottom: 0;
 }
 
 .digest-content h3 {
@@ -610,10 +813,10 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
     align-items: center;
+    border: 1px solid transparent;
 }
 
 .digest-list-item:hover {
-    background: var(--bg-primary);
     border-color: var(--accent);
 }
 
@@ -641,7 +844,7 @@ body {
 }
 
 .digest-attention.warning {
-    background: rgba(232, 168, 84, 0.2);
+    background: rgba(220, 170, 90, 0.2);
     color: var(--warning);
 }
 
@@ -667,6 +870,403 @@ body {
 }
 
 /* ============================================
+   PLANET-SPECIFIC LAYOUTS & FEELS
+   ============================================ */
+
+/* ☿ MERCURY - Terminal/CLI aesthetic, minimal, fast */
+[data-theme="mercury"] .container {
+    max-width: 700px;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+}
+
+[data-theme="mercury"] .card {
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 0;
+    padding: 1rem 1.25rem;
+}
+
+[data-theme="mercury"] .card h2 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.75rem;
+}
+
+[data-theme="mercury"] .card h2::before {
+    content: '> ';
+    color: var(--accent);
+}
+
+[data-theme="mercury"] .status-grid {
+    gap: 0.5rem;
+}
+
+[data-theme="mercury"] .status-item .label {
+    font-size: 0.7rem;
+}
+
+[data-theme="mercury"] .digest-content {
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* ♀ VENUS - Dreamy, hazy, soft focus */
+[data-theme="venus"] .card {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 200, 100, 0.15);
+    box-shadow:
+        0 8px 32px rgba(232, 184, 74, 0.1),
+        inset 0 0 60px rgba(255, 200, 100, 0.03);
+}
+
+[data-theme="venus"] .header {
+    padding: 2rem 0;
+}
+
+[data-theme="venus"] .logo h1 {
+    font-weight: 300;
+    font-style: italic;
+    letter-spacing: 0.05em;
+}
+
+[data-theme="venus"] .tagline {
+    font-style: italic;
+    opacity: 0.8;
+}
+
+[data-theme="venus"] .btn-primary {
+    border-radius: 30px;
+    padding: 0.75rem 2rem;
+}
+
+/* 🜨 EARTH - Balanced, familiar, comfortable */
+[data-theme="earth"] .card {
+    border-radius: 12px;
+}
+
+[data-theme="earth"] .header .logo h1 {
+    font-weight: 600;
+}
+
+/* ♂ MARS - Industrial, modular, frontier base */
+[data-theme="mars"] .container {
+    max-width: 900px;
+}
+
+[data-theme="mars"] .card {
+    border: 2px solid var(--border);
+    border-radius: 2px;
+    position: relative;
+}
+
+[data-theme="mars"] .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+}
+
+[data-theme="mars"] .card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+}
+
+[data-theme="mars"] .card h2 {
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.25rem;
+}
+
+[data-theme="mars"] .status-grid {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    margin: -0.5rem;
+    margin-top: 0;
+}
+
+[data-theme="mars"] .btn {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.85rem;
+    border-radius: 2px;
+}
+
+/* ♃ JUPITER - Bold horizontal bands, massive, powerful */
+[data-theme="jupiter"] .container {
+    max-width: 850px;
+}
+
+[data-theme="jupiter"] .card {
+    background: linear-gradient(180deg,
+            rgba(232, 164, 84, 0.08) 0%,
+            rgba(30, 26, 21, 1) 15%,
+            rgba(40, 35, 28, 1) 50%,
+            rgba(30, 26, 21, 1) 85%,
+            rgba(232, 164, 84, 0.08) 100%);
+    border-left: 4px solid var(--accent);
+    border-right: 4px solid var(--accent);
+    border-top: none;
+    border-bottom: none;
+    padding: 2rem;
+}
+
+[data-theme="jupiter"] .card h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+}
+
+[data-theme="jupiter"] .logo h1 {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+[data-theme="jupiter"] .btn-primary {
+    font-size: 1rem;
+    padding: 1rem 2rem;
+    font-weight: 600;
+}
+
+[data-theme="jupiter"] .digest-content {
+    font-size: 1.05rem;
+}
+
+/* ♄ SATURN - Elegant, ringed borders, luxurious */
+[data-theme="saturn"] .container {
+    max-width: 750px;
+}
+
+[data-theme="saturn"] .card {
+    border: 1px solid rgba(212, 176, 112, 0.3);
+    position: relative;
+    padding: 2rem;
+}
+
+[data-theme="saturn"] .card::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 20%;
+    right: 20%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+
+[data-theme="saturn"] .card::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 20%;
+    right: 20%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+
+[data-theme="saturn"] .header {
+    padding: 2.5rem 0;
+}
+
+[data-theme="saturn"] .logo h1 {
+    font-weight: 400;
+    letter-spacing: 0.1em;
+}
+
+[data-theme="saturn"] .card h2 {
+    text-align: center;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+}
+
+[data-theme="saturn"] .action-buttons {
+    justify-content: center;
+}
+
+[data-theme="saturn"] .btn-primary {
+    border-radius: 30px;
+    padding: 0.875rem 2.5rem;
+    border: 1px solid var(--accent);
+}
+
+[data-theme="saturn"] .digest-content {
+    text-align: justify;
+}
+
+/* ♅ URANUS - Tilted, icy, asymmetric, unusual */
+[data-theme="uranus"] .container {
+    max-width: 780px;
+}
+
+[data-theme="uranus"] .card {
+    transform: rotate(-1deg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(100, 200, 220, 0.2);
+}
+
+[data-theme="uranus"] .card:nth-child(even) {
+    transform: rotate(1deg);
+}
+
+[data-theme="uranus"] .card:hover {
+    transform: rotate(0deg);
+}
+
+[data-theme="uranus"] .header {
+    transform: rotate(-2deg);
+    margin-bottom: 2.5rem;
+}
+
+[data-theme="uranus"] .status-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: space-between;
+}
+
+[data-theme="uranus"] .status-item {
+    flex: 0 0 auto;
+}
+
+[data-theme="uranus"] .btn {
+    transform: skewX(-3deg);
+}
+
+[data-theme="uranus"] .btn:hover {
+    transform: skewX(0deg);
+}
+
+/* ♆ NEPTUNE - Deep, calm, observatory, watchful */
+[data-theme="neptune"] .card {
+    border: 1px solid rgba(90, 138, 220, 0.2);
+    box-shadow: 0 4px 24px rgba(90, 138, 220, 0.1);
+}
+
+[data-theme="neptune"] .header {
+    padding: 2rem 0 2.5rem;
+}
+
+[data-theme="neptune"] .logo .icon {
+    animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+[data-theme="neptune"] .card h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+[data-theme="neptune"] .card h2::before {
+    content: '◉';
+    font-size: 0.6rem;
+    color: var(--accent);
+}
+
+[data-theme="neptune"] .digest-content {
+    padding-left: 1rem;
+    border-left: 2px solid rgba(90, 138, 220, 0.2);
+}
+
+/* 🌌 VOID - Brutalist, minimal, pure emptiness */
+[data-theme="void"] body {
+    letter-spacing: 0.02em;
+}
+
+[data-theme="void"] .container {
+    max-width: 600px;
+}
+
+[data-theme="void"] .card {
+    background: transparent;
+    border: 1px solid #333;
+    border-radius: 0;
+    padding: 1.5rem;
+}
+
+[data-theme="void"] .card h2 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #333;
+}
+
+[data-theme="void"] .header {
+    padding: 3rem 0 2rem;
+}
+
+[data-theme="void"] .logo h1 {
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    font-weight: 400;
+}
+
+[data-theme="void"] .tagline {
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    margin-top: 1rem;
+}
+
+[data-theme="void"] .status-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+[data-theme="void"] .status-item .label {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+}
+
+[data-theme="void"] .status-item .value {
+    font-size: 1.1rem;
+    font-weight: 400;
+}
+
+[data-theme="void"] .btn {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 1rem 2rem;
+}
+
+[data-theme="void"] .digest-content {
+    font-size: 0.95rem;
+    line-height: 2;
+}
+
+[data-theme="void"] .footer {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+/* ============================================
    Responsive
    ============================================ */
 
@@ -675,15 +1275,18 @@ body {
         padding: 1rem;
     }
 
-    .theme-bar {
-        padding: 0.5rem 1rem;
-        gap: 0.25rem;
-        flex-wrap: wrap;
+    .planet-bar {
+        padding: 0.75rem 1rem;
+        gap: 0.5rem;
     }
 
-    .theme-btn {
-        padding: 0.4rem 0.75rem;
-        font-size: 0.75rem;
+    .planet-btn {
+        width: 24px;
+        height: 24px;
+    }
+
+    .planet-btn::after {
+        display: none;
     }
 
     .status-grid {
@@ -701,5 +1304,21 @@ body {
     .digest-list-item {
         grid-template-columns: 1fr;
         gap: 0.5rem;
+    }
+
+    /* Reset transforms on mobile */
+    [data-theme="uranus"] .card,
+    [data-theme="uranus"] .card:nth-child(even),
+    [data-theme="uranus"] .header,
+    [data-theme="uranus"] .btn {
+        transform: none;
+    }
+
+    [data-theme="jupiter"] .card {
+        padding: 1.25rem;
+    }
+
+    [data-theme="saturn"] .card {
+        padding: 1.25rem;
     }
 }
