@@ -56,14 +56,23 @@ function updateUIState(status) {
     const digestCard = document.getElementById('digest-card');
     const startSetupBtn = document.getElementById('start-setup');
 
+    // Update button state based on configuration
     if (status.configured) {
-        // Enable setup button if API key is configured
         startSetupBtn.disabled = false;
-        startSetupBtn.textContent = 'Start Setup';
+        if (status.profileComplete) {
+            startSetupBtn.textContent = 'Edit Profile';
+        } else {
+            startSetupBtn.textContent = 'Start Setup';
+        }
     } else {
         startSetupBtn.disabled = true;
         startSetupBtn.textContent = 'Configure API Key First';
     }
+
+    // Add click handler for setup button
+    startSetupBtn.onclick = () => {
+        window.location.href = '/setup.html';
+    };
 
     // Show/hide cards based on setup state
     if (status.entitiesMonitored > 0) {
@@ -74,6 +83,7 @@ function updateUIState(status) {
         digestCard.classList.add('hidden');
     }
 }
+
 
 function showError(message) {
     const statusGrid = document.getElementById('status-grid');

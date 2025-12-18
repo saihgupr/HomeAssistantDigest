@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup - Home Assistant Digest</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                </svg>
+                <h1>Home Assistant Digest</h1>
+            </div>
+            <p class="tagline">Let's set up your home profile</p>
+        </header>
+
+        <main class="main">
+            <!-- Progress Bar -->
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+            <p class="progress-text" id="progress-text">Step 1 of 4</p>
+
+            <!-- Question Container -->
+            <section class="card question-card" id="question-card">
+                <h2 id="question-title">Loading...</h2>
+                <p class="question-description" id="question-description"></p>
+
+                <div class="question-content" id="question-content">
+                    <!-- Dynamic content rendered here -->
+                </div>
+            </section>
+
+            <!-- Navigation -->
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" id="btn-back" disabled>
+                    ← Back
+                </button>
+                <button class="btn btn-primary" id="btn-next">
+                    Next →
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script src="setup.js"></script>
+</body>
+
+</html>
