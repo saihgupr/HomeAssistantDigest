@@ -3,8 +3,11 @@ const path = require('path');
 const { initDatabase } = require('./db');
 const { isProfileComplete, getProfile } = require('./db/profile');
 const { getTotalCounts } = require('./db/entities');
+const { getSnapshotStats } = require('./db/snapshots');
 const profileRoutes = require('./api/profile');
 const entityRoutes = require('./api/entities');
+const collectorRoutes = require('./api/collector');
+const { startScheduler, getSchedulerStatus } = require('./services/scheduler');
 
 const app = express();
 const PORT = process.env.PORT || 8099;
@@ -18,6 +21,7 @@ app.use(express.static(path.join(__dirname, '..', 'ui')));
 // API Routes
 app.use('/api/profile', profileRoutes);
 app.use('/api/entities', entityRoutes);
+app.use('/api/collector', collectorRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -42,6 +46,8 @@ app.get('/api/status', (req, res) => {
             nextDigest: null, // TODO: Implement
             entitiesMonitored: getTotalCounts().monitored,
             entitiesDiscovered: getTotalCounts().total > 0,
+            snapshotStats: getSnapshotStats(),
+            scheduler: getSchedulerStatus(),
             profile: isProfileComplete() ? profile : null
         });
     } catch (error) {
@@ -66,6 +72,15 @@ async function start() {
 
             if (!process.env.GEMINI_API_KEY) {
                 console.warn('Warning: GEMINI_API_KEY not configured');
+            }
+
+            // Auto-start scheduler if entities are configured
+            const entityCounts = getTotalCounts();
+            if (entityCounts.monitored > 0) {
+                console.log(`Found ${entityCounts.monitored} monitored entities, starting scheduler...`);
+                startScheduler();
+            } else {
+                console.log('No entities configured yet, scheduler will start after entity discovery');
             }
         });
     } catch (error) {
