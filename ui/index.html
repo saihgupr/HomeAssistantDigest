@@ -1,14 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="observatory">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Assistant Digest</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&family=Source+Sans+Pro:wght@400;600&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
+    <!-- Stars background for Observatory theme -->
+    <div class="stars"></div>
+
+    <!-- Theme Selector -->
+    <nav class="theme-bar">
+        <button class="theme-btn" data-theme="morning-pages">Morning Pages</button>
+        <button class="theme-btn active" data-theme="observatory">Observatory</button>
+        <button class="theme-btn" data-theme="monet">Monet</button>
+        <button class="theme-btn" data-theme="home-base">Home Base</button>
+    </nav>
+
     <div class="container">
         <header class="header">
             <div class="logo">
@@ -19,12 +35,13 @@
                 <h1>Home Assistant Digest</h1>
             </div>
             <p class="tagline">AI-powered daily health reports for your smart home</p>
+            <p class="date-display" id="current-date"></p>
         </header>
 
         <main class="main">
             <!-- Status Card -->
             <section class="card status-card">
-                <h2>Status</h2>
+                <h2>System Status</h2>
                 <div class="status-grid" id="status-grid">
                     <div class="status-item">
                         <span class="label">API Key</span>
@@ -89,10 +106,10 @@
                 <h2>Actions</h2>
                 <div class="action-buttons">
                     <button class="btn btn-primary" id="generate-digest">
-                        🔄 Generate Digest Now
+                        Generate Digest Now
                     </button>
                     <button class="btn btn-secondary" id="test-notification">
-                        🔔 Test Notification
+                        Test Notification
                     </button>
                 </div>
                 <div id="action-status" class="action-status"></div>

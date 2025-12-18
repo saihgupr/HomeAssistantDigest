@@ -5,10 +5,55 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function init() {
+    initThemeSwitcher();
+    updateDateDisplay();
     await loadStatus();
     await loadDigestStatus();
     setupEventListeners();
 }
+
+// ============================================
+// Theme Switcher
+// ============================================
+
+function initThemeSwitcher() {
+    const savedTheme = localStorage.getItem('ha-digest-theme') || 'observatory';
+    setTheme(savedTheme);
+
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const theme = btn.dataset.theme;
+            setTheme(theme);
+            localStorage.setItem('ha-digest-theme', theme);
+        });
+    });
+}
+
+function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // Update active button
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.theme === theme);
+    });
+}
+
+// ============================================
+// Date Display
+// ============================================
+
+function updateDateDisplay() {
+    const dateEl = document.getElementById('current-date');
+    if (dateEl) {
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateEl.textContent = now.toLocaleDateString('en-US', options);
+    }
+}
+
+// ============================================
+// Event Listeners
+// ============================================
 
 function setupEventListeners() {
     const startSetupBtn = document.getElementById('start-setup');
@@ -25,6 +70,10 @@ function setupEventListeners() {
         testNotificationBtn.addEventListener('click', handleTestNotification);
     }
 }
+
+// ============================================
+// Status Loading
+// ============================================
 
 async function loadStatus() {
     try {
@@ -47,25 +96,25 @@ function updateUIState(status) {
     const nextDigest = document.getElementById('next-digest');
 
     // API Key status
-    apiStatus.textContent = status.configured ? '✓ Configured' : '✗ Missing';
+    apiStatus.textContent = status.configured ? 'Configured' : 'Missing';
     apiStatus.className = `value ${status.configured ? 'success' : 'error'}`;
 
     // Profile status
-    profileStatus.textContent = status.profileComplete ? '✓ Complete' : '✗ Incomplete';
+    profileStatus.textContent = status.profileComplete ? 'Complete' : 'Incomplete';
     profileStatus.className = `value ${status.profileComplete ? 'success' : 'warning'}`;
 
     // Entities count
-    entitiesCount.textContent = `${status.entitiesMonitored || 0} monitored`;
+    entitiesCount.textContent = `${status.entitiesMonitored || 0}`;
     entitiesCount.className = `value ${status.entitiesMonitored > 0 ? 'success' : ''}`;
 
     // Snapshot stats
     if (status.snapshotStats) {
-        snapshotCount.textContent = `${status.snapshotStats.total_snapshots || 0} stored`;
+        snapshotCount.textContent = `${status.snapshotStats.total_snapshots || 0}`;
     }
 
     // Scheduler status
     if (status.scheduler) {
-        schedulerStatus.textContent = status.scheduler.isRunning ? '✓ Running' : '○ Stopped';
+        schedulerStatus.textContent = status.scheduler.isRunning ? 'Running' : 'Stopped';
         schedulerStatus.className = `value ${status.scheduler.isRunning ? 'success' : 'warning'}`;
         nextDigest.textContent = status.scheduler.digestTime || '--:--';
     }
@@ -97,13 +146,13 @@ function updateUIState(status) {
         startSetupBtn.disabled = false;
 
         if (!status.configured) {
-            startSetupBtn.textContent = '1. Configure API Key';
+            startSetupBtn.textContent = 'Configure API Key First';
             startSetupBtn.disabled = true;
         } else if (!status.profileComplete) {
-            startSetupBtn.textContent = '2. Set Up Profile';
+            startSetupBtn.textContent = 'Set Up Profile';
             startSetupBtn.onclick = () => { window.location.href = '/setup.html'; };
         } else if (!status.entitiesDiscovered) {
-            startSetupBtn.textContent = '3. Discover Entities';
+            startSetupBtn.textContent = 'Discover Entities';
             startSetupBtn.onclick = () => { window.location.href = '/entities.html'; };
         }
     }
@@ -124,6 +173,10 @@ function updateSetupSteps(status) {
         step3.classList.add('complete');
     }
 }
+
+// ============================================
+// Digest Loading
+// ============================================
 
 async function loadDigestStatus() {
     try {
@@ -168,7 +221,6 @@ async function loadFullDigest(digestId) {
 
         if (data.digest && data.digest.content) {
             const digestContent = document.getElementById('digest-content');
-            // Convert markdown to HTML (simple conversion)
             digestContent.innerHTML = markdownToHtml(data.digest.content);
         }
     } catch (error) {
@@ -200,6 +252,10 @@ async function loadDigestHistory() {
     }
 }
 
+// ============================================
+// Actions
+// ============================================
+
 async function handleStartSetup() {
     window.location.href = '/setup.html';
 }
@@ -209,7 +265,7 @@ async function handleGenerateDigest() {
     const actionStatus = document.getElementById('action-status');
 
     btn.disabled = true;
-    btn.textContent = '⏳ Generating...';
+    btn.textContent = 'Generating...';
     actionStatus.textContent = 'Calling Gemini AI to analyze your smart home...';
     actionStatus.className = 'action-status info';
 
@@ -218,7 +274,7 @@ async function handleGenerateDigest() {
         const data = await response.json();
 
         if (data.success) {
-            actionStatus.textContent = '✓ Digest generated successfully!';
+            actionStatus.textContent = 'Digest generated successfully!';
             actionStatus.className = 'action-status success';
 
             // Reload digest display
@@ -229,11 +285,11 @@ async function handleGenerateDigest() {
         }
     } catch (error) {
         console.error('Generate digest error:', error);
-        actionStatus.textContent = `✗ Error: ${error.message}`;
+        actionStatus.textContent = `Error: ${error.message}`;
         actionStatus.className = 'action-status error';
     } finally {
         btn.disabled = false;
-        btn.textContent = '🔄 Generate Digest Now';
+        btn.textContent = 'Generate Digest Now';
     }
 }
 
@@ -248,19 +304,22 @@ async function handleTestNotification() {
         const data = await response.json();
 
         if (data.success) {
-            actionStatus.textContent = '✓ Test notification sent!';
+            actionStatus.textContent = 'Test notification sent!';
             actionStatus.className = 'action-status success';
         } else {
             throw new Error(data.error || 'Failed to send notification');
         }
     } catch (error) {
         console.error('Test notification error:', error);
-        actionStatus.textContent = `✗ Error: ${error.message}`;
+        actionStatus.textContent = `Error: ${error.message}`;
         actionStatus.className = 'action-status error';
     }
 }
 
-// Simple markdown to HTML converter
+// ============================================
+// Markdown Parser
+// ============================================
+
 function markdownToHtml(markdown) {
     return markdown
         // Headers
@@ -281,3 +340,6 @@ function markdownToHtml(markdown) {
         // Horizontal rule
         .replace(/---/g, '<hr>');
 }
+
+// Make loadFullDigest available globally for onclick handlers
+window.loadFullDigest = loadFullDigest;
