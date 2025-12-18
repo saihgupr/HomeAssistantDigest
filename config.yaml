@@ -25,4 +25,4 @@ schema:
   notification_service: str
   history_days: int
   snapshot_interval_minutes: int
-image: "ghcr.io/diggingfordinos/ha-digest-{arch}"
+

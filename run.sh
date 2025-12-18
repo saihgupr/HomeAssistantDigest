@@ -1,4 +1,4 @@
-#!/usr/bin/env bashrc
+#!/usr/bin/env bash
 set -e
 
 # Read add-on options
