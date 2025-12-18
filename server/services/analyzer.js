@@ -214,7 +214,11 @@ Analyze the data and return a JSON object with the following structure:
   "tip": "One actionable tip for the user."
 }
 
-Ensure the "attention_items" array is empty if there are no issues. Be strict about what constitutes an issue.
+Ensure the "attention_items" array is empty if there are no issues. Be VERY strict about what constitutes an issue:
+- Batteries above 30% are FINE - do not flag as warnings
+- Normal operating conditions are not issues - only flag actual malfunctions or critical thresholds
+- Don't be alarmist about minor variations or things that are "lower than others" but still healthy
+- Only include attention_items for things that genuinely need user action NOW
 ${isFirstRun ? 'Since this is the first run with no data yet, attention_items should be EMPTY and the tone should be welcoming.' : ''}
 Do NOT include markdown formatting in the JSON. Return ONLY raw JSON.`;
 
