@@ -415,6 +415,122 @@ async function getSupervisorInfo() {
     }
 }
 
+// ============================================
+// AUTOMATION & SCRIPT HEALTH FUNCTIONS
+// ============================================
+
+/**
+ * Get automation health report - disabled automations, recently triggered, etc.
+ */
+async function getAutomationHealthReport() {
+    try {
+        const states = await getAllStates();
+        const automations = states.filter(e => e.entity_id.startsWith('automation.'));
+
+        const report = {
+            total: automations.length,
+            enabled: 0,
+            disabled: 0,
+            issues: [],
+            automations: []
+        };
+
+        for (const auto of automations) {
+            const info = {
+                name: auto.attributes.friendly_name || auto.entity_id,
+                entity_id: auto.entity_id,
+                state: auto.state, // 'on' = enabled, 'off' = disabled
+                last_triggered: auto.attributes.last_triggered || null
+            };
+
+            if (auto.state === 'on') {
+                report.enabled++;
+            } else {
+                report.disabled++;
+            }
+
+            // Check for automations that haven't run in a long time but are enabled
+            if (auto.state === 'on' && auto.attributes.last_triggered) {
+                const lastRun = new Date(auto.attributes.last_triggered);
+                const daysSinceRun = (Date.now() - lastRun.getTime()) / (1000 * 60 * 60 * 24);
+
+                // Flag automations that haven't run in 30+ days
+                if (daysSinceRun > 30) {
+                    report.issues.push({
+                        name: info.name,
+                        issue: `Hasn't triggered in ${Math.floor(daysSinceRun)} days`,
+                        severity: 'info'
+                    });
+                }
+            }
+
+            report.automations.push(info);
+        }
+
+        return report;
+    } catch (error) {
+        console.error('[Automations] Failed to get automation health:', error.message);
+        return { total: 0, enabled: 0, disabled: 0, issues: [], automations: [] };
+    }
+}
+
+/**
+ * Get integration/config entry status
+ */
+async function getIntegrationHealthReport() {
+    try {
+        // Get config entries via API
+        const response = await haRequest('/api/config/config_entries/entry');
+        const entries = Array.isArray(response) ? response : [];
+
+        const report = {
+            total: entries.length,
+            loaded: 0,
+            failed: 0,
+            issues: [],
+            integrations: []
+        };
+
+        for (const entry of entries) {
+            const info = {
+                title: entry.title || entry.domain,
+                domain: entry.domain,
+                state: entry.state, // 'loaded', 'setup_error', 'setup_retry', 'not_loaded', etc.
+            };
+
+            // Count by state
+            if (entry.state === 'loaded') {
+                report.loaded++;
+            } else {
+                report.failed++;
+
+                // Add to issues
+                const stateLabels = {
+                    'setup_error': 'Setup failed',
+                    'setup_retry': 'Retrying setup',
+                    'not_loaded': 'Not loaded',
+                    'failed_unload': 'Failed to unload',
+                    'migration_error': 'Migration error'
+                };
+
+                report.issues.push({
+                    name: info.title,
+                    domain: entry.domain,
+                    issue: stateLabels[entry.state] || entry.state,
+                    severity: entry.state === 'setup_error' ? 'warning' : 'info'
+                });
+            }
+
+            report.integrations.push(info);
+        }
+
+        return report;
+    } catch (error) {
+        console.error('[Integrations] Failed to get integration health:', error.message);
+        return { total: 0, loaded: 0, failed: 0, issues: [], integrations: [] };
+    }
+}
+
 module.exports = {
     haRequest,
     supervisorRequest,
@@ -434,5 +550,8 @@ module.exports = {
     getAddonStats,
     getAddonHealthReport,
     getHostInfo,
-    getSupervisorInfo
+    getSupervisorInfo,
+    // Automation & Integration health
+    getAutomationHealthReport,
+    getIntegrationHealthReport
 };

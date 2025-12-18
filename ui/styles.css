@@ -985,7 +985,20 @@ body {
     padding: 0.75rem 1rem;
     border-radius: var(--radius);
     font-size: 0.9rem;
-    min-height: 2.5rem;
+}
+
+.action-status:empty {
+    display: none;
+}
+
+.actions-card {
+    padding-bottom: 1.25rem;
+}
+
+.actions-card .action-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
 }
 
 .action-status.info {

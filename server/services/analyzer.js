@@ -2,7 +2,7 @@ const { getAllSnapshotsForAnalysis } = require('../db/snapshots');
 const { getProfile } = require('../db/profile');
 const { getMonitoredEntities, getEntityStats } = require('../db/entities');
 const { addDigest, getLatestDigest } = require('../db/digests');
-const { getAddonHealthReport } = require('./homeassistant');
+const { getAddonHealthReport, getAutomationHealthReport, getIntegrationHealthReport } = require('./homeassistant');
 
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
@@ -38,8 +38,26 @@ async function generateDigest(type = 'daily') {
         console.error('[Digest] Failed to get add-on report:', error.message);
     }
 
+    // Fetch automation health report
+    let automationReport = null;
+    try {
+        automationReport = await getAutomationHealthReport();
+        console.log(`[Digest] Automation report: ${automationReport.total} automations, ${automationReport.enabled} enabled, ${automationReport.issues.length} issues`);
+    } catch (error) {
+        console.error('[Digest] Failed to get automation report:', error.message);
+    }
+
+    // Fetch integration health report
+    let integrationReport = null;
+    try {
+        integrationReport = await getIntegrationHealthReport();
+        console.log(`[Digest] Integration report: ${integrationReport.total} integrations, ${integrationReport.failed} failed`);
+    } catch (error) {
+        console.error('[Digest] Failed to get integration report:', error.message);
+    }
+
     // Build the prompt
-    const prompt = buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport);
+    const prompt = buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport, automationReport, integrationReport);
 
     // Call Gemini API
     const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
@@ -99,7 +117,7 @@ async function generateDigest(type = 'daily') {
 /**
  * Build the analysis prompt for Gemini
  */
-function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport = null) {
+function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport = null, automationReport = null, integrationReport = null) {
     const periodLabel = type === 'weekly' ? 'past week' : 'past 24 hours';
 
     // Detect first-run scenario (no snapshot data yet)
@@ -160,6 +178,34 @@ ${addonSummary.join('\n')}
 `;
     }
 
+    // Build automation summary
+    let automationSection = '';
+    if (automationReport && automationReport.total > 0) {
+        const autoSummary = [
+            `Total: ${automationReport.total} automations (${automationReport.enabled} enabled, ${automationReport.disabled} disabled)`,
+            ...automationReport.issues.slice(0, 5).map(i => `- ${i.name}: ${i.issue}`)
+        ].filter(Boolean);
+
+        automationSection = `
+## Automation Health
+${autoSummary.join('\n')}
+`;
+    }
+
+    // Build integration summary  
+    let integrationSection = '';
+    if (integrationReport && integrationReport.issues.length > 0) {
+        const intSummary = [
+            `${integrationReport.failed} of ${integrationReport.total} integrations have issues:`,
+            ...integrationReport.issues.map(i => `- ${i.name} (${i.domain}): ${i.issue}`)
+        ];
+
+        integrationSection = `
+## Integration Issues
+${intSummary.join('\n')}
+`;
+    }
+
     // First-run specific instructions
     const firstRunInstructions = isFirstRun ? `
 ## IMPORTANT: First Run Scenario
@@ -184,7 +230,7 @@ ${profile.concerns ? `- Concerns: ${profile.concerns}` : ''}
 
 ## Entity Overview
 Total monitored: ${entities.length} entities across ${entityStats.length} categories
-${addonSection}
+${addonSection}${automationSection}${integrationSection}
 ## Data from ${periodLabel}
 ${entitySummaries.length > 0 ? entitySummaries.join('\\n') : 'No snapshot data available yet - this is expected for a new setup.'}
 
