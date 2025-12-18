@@ -17,46 +17,19 @@
     <!-- Stars background for space themes -->
     <div class="stars"></div>
 
-    <!-- Planet Selector (Orbital Style) -->
-    <nav class="planet-bar">
-        <button class="planet-btn" data-theme="mercury" title="Mercury - Terminal">
-            <span class="planet-label">Mercury</span>
-        </button>
-        <button class="planet-btn" data-theme="venus" title="Venus - Dreamy">
-            <span class="planet-label">Venus</span>
-        </button>
-        <button class="planet-btn" data-theme="earth" title="Earth - Home">
-            <span class="planet-label">Earth</span>
-        </button>
-        <button class="planet-btn" data-theme="mars" title="Mars - Industrial">
-            <span class="planet-label">Mars</span>
-        </button>
-        <button class="planet-btn" data-theme="jupiter" title="Jupiter - Bold">
-            <span class="planet-label">Jupiter</span>
-        </button>
-        <button class="planet-btn" data-theme="saturn" title="Saturn - Elegant">
-            <span class="planet-label">Saturn</span>
-        </button>
-        <button class="planet-btn" data-theme="uranus" title="Uranus - Tilted">
-            <span class="planet-label">Uranus</span>
-        </button>
-        <button class="planet-btn active" data-theme="neptune" title="Neptune - Observatory">
-            <span class="planet-label">Neptune</span>
-        </button>
-        <span class="planet-divider"></span>
-        <button class="planet-btn" data-theme="void" title="Void - Minimal">
-            <span class="planet-label">Void</span>
-        </button>
-    </nav>
-
-    <!-- Layout Style Slider -->
-    <nav class="layout-bar">
-        <span class="layout-label">Layout:</span>
-        <div class="layout-slider">
-            <button class="layout-btn" data-layout="morning-pages">Morning Pages</button>
-            <button class="layout-btn" data-layout="observatory">Observatory</button>
-            <button class="layout-btn active" data-layout="monet">Monet</button>
-            <button class="layout-btn" data-layout="home-base">Home Base</button>
+    <!-- Top Bar: Theme + Digest Toggle -->
+    <nav class="top-bar">
+        <div class="theme-display">
+            <span class="theme-badge neptune">Neptune</span>
+            <span class="theme-divider">•</span>
+            <span class="theme-badge monet">Monet</span>
+        </div>
+        <div class="digest-type-slider">
+            <span class="slider-label">View:</span>
+            <div class="layout-slider">
+                <button class="layout-btn active" data-digest-type="daily">Daily</button>
+                <button class="layout-btn" data-digest-type="weekly">Weekly</button>
+            </div>
         </div>
     </nav>
 
@@ -121,7 +94,8 @@
                         <span class="step-number">2</span>
                         <div class="step-content">
                             <h3>Set Up Home Profile</h3>
-                            <p>Answer a few quick questions about your home. We'll automatically monitor everything for you!</p>
+                            <p>Answer a few quick questions about your home. We'll automatically monitor everything for
+                                you!</p>
                         </div>
                     </div>
                 </div>

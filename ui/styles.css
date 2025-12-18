@@ -233,8 +233,69 @@ body {
 }
 
 /* ============================================
-   Planet Selector Bar (Orbital Style)
+   Top Bar (Theme Display + Digest Toggle)
    ============================================ */
+
+.top-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(10px);
+}
+
+.theme-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.theme-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+}
+
+.theme-badge.neptune {
+    background: rgba(90, 138, 220, 0.2);
+    color: #5a8adc;
+}
+
+.theme-badge.monet {
+    background: rgba(200, 180, 160, 0.15);
+    color: #c8b4a0;
+}
+
+.theme-divider {
+    color: var(--text-muted);
+    opacity: 0.5;
+}
+
+.digest-type-slider {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.slider-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* ============================================
+   Planet Selector Bar (Orbital Style)
 
 .planet-bar {
     position: sticky;
