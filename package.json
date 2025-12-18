@@ -1,6 +1,6 @@
 {
   "name": "ha-digest",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AI-powered daily health reports for your smart home",
   "main": "server/index.js",
   "scripts": {
