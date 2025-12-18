@@ -2,7 +2,9 @@ const express = require('express');
 const path = require('path');
 const { initDatabase } = require('./db');
 const { isProfileComplete, getProfile } = require('./db/profile');
+const { getTotalCounts } = require('./db/entities');
 const profileRoutes = require('./api/profile');
+const entityRoutes = require('./api/entities');
 
 const app = express();
 const PORT = process.env.PORT || 8099;
@@ -15,6 +17,7 @@ app.use(express.static(path.join(__dirname, '..', 'ui')));
 
 // API Routes
 app.use('/api/profile', profileRoutes);
+app.use('/api/entities', entityRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -37,7 +40,8 @@ app.get('/api/status', (req, res) => {
             snapshotInterval: parseInt(process.env.SNAPSHOT_INTERVAL_MINUTES) || 30,
             lastDigest: null, // TODO: Implement
             nextDigest: null, // TODO: Implement
-            entitiesMonitored: 0, // TODO: Implement
+            entitiesMonitored: getTotalCounts().monitored,
+            entitiesDiscovered: getTotalCounts().total > 0,
             profile: isProfileComplete() ? profile : null
         });
     } catch (error) {

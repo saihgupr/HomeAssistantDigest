@@ -56,26 +56,48 @@ function updateUIState(status) {
     const digestCard = document.getElementById('digest-card');
     const startSetupBtn = document.getElementById('start-setup');
 
-    // Update button state based on configuration
+    // Determine which setup step we're on
+    let setupStep = 'api'; // Need API key
+    let buttonText = 'Configure API Key First';
+    let buttonDisabled = true;
+    let nextPage = '';
+
     if (status.configured) {
-        startSetupBtn.disabled = false;
-        if (status.profileComplete) {
-            startSetupBtn.textContent = 'Edit Profile';
+        if (!status.profileComplete) {
+            setupStep = 'profile';
+            buttonText = '1. Set Up Profile';
+            buttonDisabled = false;
+            nextPage = '/setup.html';
+        } else if (!status.entitiesDiscovered) {
+            setupStep = 'entities';
+            buttonText = '2. Discover Entities';
+            buttonDisabled = false;
+            nextPage = '/entities.html';
+        } else if (status.entitiesMonitored === 0) {
+            setupStep = 'entities';
+            buttonText = 'Configure Entities';
+            buttonDisabled = false;
+            nextPage = '/entities.html';
         } else {
-            startSetupBtn.textContent = 'Start Setup';
+            setupStep = 'complete';
+            buttonText = 'Settings';
+            buttonDisabled = false;
+            nextPage = '/entities.html'; // For now, settings = entities page
         }
-    } else {
-        startSetupBtn.disabled = true;
-        startSetupBtn.textContent = 'Configure API Key First';
     }
 
+    startSetupBtn.textContent = buttonText;
+    startSetupBtn.disabled = buttonDisabled;
+
     // Add click handler for setup button
-    startSetupBtn.onclick = () => {
-        window.location.href = '/setup.html';
-    };
+    if (nextPage) {
+        startSetupBtn.onclick = () => {
+            window.location.href = nextPage;
+        };
+    }
 
     // Show/hide cards based on setup state
-    if (status.entitiesMonitored > 0) {
+    if (setupStep === 'complete') {
         setupCard.classList.add('hidden');
         digestCard.classList.remove('hidden');
     } else {
@@ -83,6 +105,7 @@ function updateUIState(status) {
         digestCard.classList.add('hidden');
     }
 }
+
 
 
 function showError(message) {

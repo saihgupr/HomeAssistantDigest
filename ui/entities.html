@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entity Discovery - HA Digest</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🔍 Entity Discovery</h1>
+            <p class="subtitle">Let's find what to monitor in your smart home</p>
+        </header>
+
+        <main class="main-content">
+            <!-- Connection Status -->
+            <div class="card" id="connection-card">
+                <div class="card-header">
+                    <span class="status-indicator" id="connection-status"></span>
+                    <h2>Home Assistant Connection</h2>
+                </div>
+                <div class="card-body" id="connection-info">
+                    <p>Checking connection...</p>
+                </div>
+            </div>
+
+            <!-- Discovery Controls -->
+            <div class="card" id="discovery-card" style="display: none;">
+                <div class="card-header">
+                    <h2>Discover Entities</h2>
+                </div>
+                <div class="card-body">
+                    <p>We'll scan your Home Assistant to find entities worth monitoring. The AI will suggest priorities
+                        based on entity type.</p>
+                    <button class="btn btn-primary" id="discover-btn">
+                        🔍 Start Discovery
+                    </button>
+                </div>
+            </div>
+
+            <!-- Discovery Results -->
+            <div class="card" id="results-card" style="display: none;">
+                <div class="card-header">
+                    <h2>Discovered Entities</h2>
+                    <span class="badge" id="entity-count">0 entities</span>
+                </div>
+                <div class="card-body">
+                    <p class="discovery-summary" id="discovery-summary"></p>
+
+                    <!-- Category Tabs -->
+                    <div class="category-tabs" id="category-tabs"></div>
+
+                    <!-- Entity List -->
+                    <div class="entity-list" id="entity-list"></div>
+
+                    <!-- Priority Legend -->
+                    <div class="priority-legend">
+                        <span class="legend-item">
+                            <span class="priority-dot critical"></span> Critical
+                        </span>
+                        <span class="legend-item">
+                            <span class="priority-dot normal"></span> Normal
+                        </span>
+                        <span class="legend-item">
+                            <span class="priority-dot low"></span> Low
+                        </span>
+                        <span class="legend-item">
+                            <span class="priority-dot ignore"></span> Ignore
+                        </span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-secondary" id="rescan-btn">Rescan</button>
+                    <button class="btn btn-primary" id="save-btn">Save & Continue</button>
+                </div>
+            </div>
+
+            <!-- Loading Overlay -->
+            <div class="loading-overlay" id="loading" style="display: none;">
+                <div class="loading-spinner"></div>
+                <p id="loading-text">Discovering entities...</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="entities.js"></script>
+</body>
+
+</html>
