@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Assistant Digest</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+                <h1>Home Assistant Digest</h1>
+            </div>
+            <p class="tagline">AI-powered daily health reports for your smart home</p>
+        </header>
+
+        <main class="main">
+            <!-- Status Card -->
+            <section class="card status-card">
+                <h2>Status</h2>
+                <div class="status-grid" id="status-grid">
+                    <div class="status-item">
+                        <span class="label">API Key</span>
+                        <span class="value" id="api-status">Checking...</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Digest Time</span>
+                        <span class="value" id="digest-time">--:--</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">History</span>
+                        <span class="value" id="history-days">- days</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Monitored</span>
+                        <span class="value" id="entities-count">- entities</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Setup Card (shown when not configured) -->
+            <section class="card setup-card" id="setup-card">
+                <h2>Getting Started</h2>
+                <div class="steps">
+                    <div class="step">
+                        <span class="step-number">1</span>
+                        <div class="step-content">
+                            <h3>Configure API Key</h3>
+                            <p>Add your Google Gemini API key in the add-on configuration.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="step-number">2</span>
+                        <div class="step-content">
+                            <h3>Set Up Home Profile</h3>
+                            <p>Answer a few questions about your home and preferences.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <span class="step-number">3</span>
+                        <div class="step-content">
+                            <h3>Run Assessment</h3>
+                            <p>Let the AI scan your Home Assistant to determine what to monitor.</p>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="start-setup" disabled>
+                    Start Setup
+                </button>
+            </section>
+
+            <!-- Latest Digest Card (shown when configured) -->
+            <section class="card digest-card hidden" id="digest-card">
+                <h2>Latest Digest</h2>
+                <div class="digest-content" id="digest-content">
+                    <p class="empty-state">No digest generated yet. Check back after your scheduled digest time.</p>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>Home Assistant Digest v0.1.0</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
