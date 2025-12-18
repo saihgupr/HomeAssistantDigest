@@ -8,6 +8,7 @@ const profileRoutes = require('./api/profile');
 const entityRoutes = require('./api/entities');
 const collectorRoutes = require('./api/collector');
 const digestRoutes = require('./api/digest');
+const devRoutes = require('./api/dev');
 const { startScheduler, getSchedulerStatus } = require('./services/scheduler');
 
 const app = express();
@@ -24,6 +25,7 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/entities', entityRoutes);
 app.use('/api/collector', collectorRoutes);
 app.use('/api/digest', digestRoutes);
+app.use('/api/dev', devRoutes);  // Development helpers
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
