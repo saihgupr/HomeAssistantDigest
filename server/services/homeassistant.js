@@ -1,5 +1,6 @@
 const SUPERVISOR_TOKEN = process.env.SUPERVISOR_TOKEN || process.env.HASSIO_TOKEN;
 const HA_URL = 'http://supervisor/core';
+const SUPERVISOR_URL = 'http://supervisor';
 
 /**
  * Make a request to the Home Assistant API
@@ -25,6 +26,28 @@ async function haRequest(endpoint, options = {}) {
 
     if (!response.ok) {
         throw new Error(`HA API error: ${response.status} ${response.statusText}`);
+    }
+
+    return response.json();
+}
+
+/**
+ * Make a request to the Supervisor API (for add-on management, host info, etc.)
+ */
+async function supervisorRequest(endpoint, options = {}) {
+    const url = `${SUPERVISOR_URL}${endpoint}`;
+
+    const response = await fetch(url, {
+        ...options,
+        headers: {
+            'Authorization': `Bearer ${SUPERVISOR_TOKEN}`,
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error(`Supervisor API error: ${response.status} ${response.statusText}`);
     }
 
     return response.json();
@@ -249,8 +272,152 @@ function determinePriority(entity, category) {
     return 'normal';
 }
 
+// ============================================
+// ADD-ON MONITORING FUNCTIONS
+// ============================================
+
+/**
+ * Get list of all installed add-ons with their status
+ */
+async function getAddons() {
+    try {
+        const response = await supervisorRequest('/addons');
+        return response.data?.addons || [];
+    } catch (error) {
+        console.error('[Add-ons] Failed to get add-on list:', error.message);
+        return [];
+    }
+}
+
+/**
+ * Get detailed info for a specific add-on
+ */
+async function getAddonInfo(slug) {
+    try {
+        const response = await supervisorRequest(`/addons/${slug}/info`);
+        return response.data || null;
+    } catch (error) {
+        console.error(`[Add-ons] Failed to get info for ${slug}:`, error.message);
+        return null;
+    }
+}
+
+/**
+ * Get stats (CPU, memory, network) for a specific add-on
+ */
+async function getAddonStats(slug) {
+    try {
+        const response = await supervisorRequest(`/addons/${slug}/stats`);
+        return response.data || null;
+    } catch (error) {
+        console.error(`[Add-ons] Failed to get stats for ${slug}:`, error.message);
+        return null;
+    }
+}
+
+/**
+ * Get comprehensive add-on health report for digest analysis
+ */
+async function getAddonHealthReport() {
+    const addons = await getAddons();
+    const report = {
+        total: addons.length,
+        running: 0,
+        stopped: 0,
+        updateAvailable: 0,
+        issues: [],
+        addons: []
+    };
+
+    for (const addon of addons) {
+        const status = {
+            name: addon.name,
+            slug: addon.slug,
+            state: addon.state,
+            version: addon.version,
+            updateAvailable: addon.update_available || false
+        };
+
+        // Count statuses
+        if (addon.state === 'started') {
+            report.running++;
+        } else {
+            report.stopped++;
+            // Only flag as issue if it was previously started
+            if (addon.boot === 'auto') {
+                report.issues.push({
+                    addon: addon.name,
+                    issue: 'Add-on is not running but set to auto-start',
+                    severity: 'warning'
+                });
+            }
+        }
+
+        if (addon.update_available) {
+            report.updateAvailable++;
+        }
+
+        // Try to get stats for running add-ons
+        if (addon.state === 'started') {
+            const stats = await getAddonStats(addon.slug);
+            if (stats) {
+                status.cpu_percent = stats.cpu_percent;
+                status.memory_percent = stats.memory_percent;
+                status.memory_usage = stats.memory_usage;
+
+                // Flag high resource usage
+                if (stats.cpu_percent > 80) {
+                    report.issues.push({
+                        addon: addon.name,
+                        issue: `High CPU usage: ${stats.cpu_percent.toFixed(1)}%`,
+                        severity: 'warning'
+                    });
+                }
+                if (stats.memory_percent > 80) {
+                    report.issues.push({
+                        addon: addon.name,
+                        issue: `High memory usage: ${stats.memory_percent.toFixed(1)}%`,
+                        severity: 'warning'
+                    });
+                }
+            }
+        }
+
+        report.addons.push(status);
+    }
+
+    return report;
+}
+
+/**
+ * Get host system info (OS, disk, etc.)
+ */
+async function getHostInfo() {
+    try {
+        const response = await supervisorRequest('/host/info');
+        return response.data || null;
+    } catch (error) {
+        console.error('[Host] Failed to get host info:', error.message);
+        return null;
+    }
+}
+
+/**
+ * Get core system info (HA version, etc.)
+ */
+async function getSupervisorInfo() {
+    try {
+        const response = await supervisorRequest('/supervisor/info');
+        return response.data || null;
+    } catch (error) {
+        console.error('[Supervisor] Failed to get supervisor info:', error.message);
+        return null;
+    }
+}
+
 module.exports = {
     haRequest,
+    supervisorRequest,
     getAllStates,
     getState,
     getHistory,
@@ -260,5 +427,12 @@ module.exports = {
     checkConnection,
     categorizeEntity,
     determineStorageStrategy,
-    determinePriority
+    determinePriority,
+    // Add-on monitoring
+    getAddons,
+    getAddonInfo,
+    getAddonStats,
+    getAddonHealthReport,
+    getHostInfo,
+    getSupervisorInfo
 };

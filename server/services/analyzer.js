@@ -2,6 +2,7 @@ const { getAllSnapshotsForAnalysis } = require('../db/snapshots');
 const { getProfile } = require('../db/profile');
 const { getMonitoredEntities, getEntityStats } = require('../db/entities');
 const { addDigest, getLatestDigest } = require('../db/digests');
+const { getAddonHealthReport } = require('./homeassistant');
 
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
@@ -28,8 +29,17 @@ async function generateDigest(type = 'daily') {
 
     const snapshots = getAllSnapshotsForAnalysis(startTime, endTime);
 
+    // Fetch add-on health report
+    let addonReport = null;
+    try {
+        addonReport = await getAddonHealthReport();
+        console.log(`[Digest] Add-on report: ${addonReport.total} add-ons, ${addonReport.running} running, ${addonReport.issues.length} issues`);
+    } catch (error) {
+        console.error('[Digest] Failed to get add-on report:', error.message);
+    }
+
     // Build the prompt
-    const prompt = buildAnalysisPrompt(profile, entities, entityStats, snapshots, type);
+    const prompt = buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport);
 
     // Call Gemini API
     const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
@@ -89,8 +99,11 @@ async function generateDigest(type = 'daily') {
 /**
  * Build the analysis prompt for Gemini
  */
-function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type) {
+function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport = null) {
     const periodLabel = type === 'weekly' ? 'past week' : 'past 24 hours';
+
+    // Detect first-run scenario (no snapshot data yet)
+    const isFirstRun = snapshots.length === 0;
 
     // Group snapshots by entity for analysis
     const entityData = {};
@@ -132,8 +145,37 @@ function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type) {
         return `- ${data.friendly_name} (${data.category}, ${data.priority}): ${stats}`;
     }).filter(Boolean);
 
-    const prompt = `You are a smart home health analyst for Home Assistant. Analyze the provided data and return a JSON object.
+    // Build add-on summary
+    let addonSection = '';
+    if (addonReport && addonReport.total > 0) {
+        const addonSummary = [
+            `Total: ${addonReport.total} add-ons (${addonReport.running} running, ${addonReport.stopped} stopped)`,
+            addonReport.updateAvailable > 0 ? `Updates available: ${addonReport.updateAvailable}` : null,
+            ...addonReport.issues.map(i => `- ⚠️ ${i.addon}: ${i.issue}`)
+        ].filter(Boolean);
 
+        addonSection = `
+## Add-on Status
+${addonSummary.join('\n')}
+`;
+    }
+
+    // First-run specific instructions
+    const firstRunInstructions = isFirstRun ? `
+## IMPORTANT: First Run Scenario
+This is the user's FIRST digest - they just set up the system. There is no snapshot data yet because data collection just started.
+
+DO NOT treat this as an error or critical issue. Instead:
+- Be welcoming and congratulate them on setting up
+- Explain that data collection has begun and meaningful analysis will be available in the next digest
+- Focus on the positive aspects of their setup (entities discovered, profile configured)
+- Give a helpful tip about what to expect
+
+The summary should be encouraging, like: "Welcome! Your smart home monitoring is now active. Check back tomorrow for your first full health report."
+` : '';
+
+    const prompt = `You are a smart home health analyst for Home Assistant. Analyze the provided data and return a JSON object.
+${firstRunInstructions}
 ## Home Profile
 ${profile.occupants ? `- Occupants: ${JSON.stringify(profile.occupants)}` : '- Occupants: Not specified'}
 ${profile.schedule ? `- Schedule: ${JSON.stringify(profile.schedule)}` : '- Schedule: Not specified'}
@@ -142,9 +184,9 @@ ${profile.concerns ? `- Concerns: ${profile.concerns}` : ''}
 
 ## Entity Overview
 Total monitored: ${entities.length} entities across ${entityStats.length} categories
-
+${addonSection}
 ## Data from ${periodLabel}
-${entitySummaries.length > 0 ? entitySummaries.join('\n') : 'No snapshot data available yet.'}
+${entitySummaries.length > 0 ? entitySummaries.join('\\n') : 'No snapshot data available yet - this is expected for a new setup.'}
 
 ## Your Task
 Analyze the data and return a JSON object with the following structure:
@@ -173,6 +215,7 @@ Analyze the data and return a JSON object with the following structure:
 }
 
 Ensure the "attention_items" array is empty if there are no issues. Be strict about what constitutes an issue.
+${isFirstRun ? 'Since this is the first run with no data yet, attention_items should be EMPTY and the tone should be welcoming.' : ''}
 Do NOT include markdown formatting in the JSON. Return ONLY raw JSON.`;
 
     return prompt;
