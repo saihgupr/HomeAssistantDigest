@@ -248,8 +248,10 @@ async function loadFullDigest(digestId) {
         const data = await response.json();
 
         if (data.digest && data.digest.content) {
-            const digestContent = document.getElementById('digest-content');
-            digestContent.innerHTML = markdownToHtml(data.digest.content);
+            const digestGrid = document.getElementById('digest-grid');
+            // Hide legacy content, show grid
+            document.getElementById('digest-content').style.display = 'none';
+            digestGrid.innerHTML = renderDigestCards(data.digest.content);
         }
     } catch (error) {
         console.error('Failed to load full digest:', error);
@@ -307,6 +309,11 @@ async function handleGenerateDigest() {
 
             // Reload digest display
             displayLatestDigest(data.digest);
+            // Trigger full render because displayLatestDigest only sets timestamp if ID present
+            if (data.digest.id) {
+                loadFullDigest(data.digest.id);
+            }
+
             await loadDigestHistory();
         } else {
             throw new Error(data.error || 'Failed to generate digest');
@@ -348,25 +355,113 @@ async function handleTestNotification() {
 // Markdown Parser
 // ============================================
 
+// ============================================
+// Card Renderer
+// ============================================
+
+function renderDigestCards(digestData) {
+    if (typeof digestData === 'string') {
+        try {
+            digestData = JSON.parse(digestData);
+        } catch (e) {
+            // Fallback for legacy markdown digests
+            return markdownToHtml(digestData);
+        }
+    }
+
+    let html = '';
+
+    // 1. Summary Block
+    if (digestData.summary) {
+        html += `<div class="digest-summary-block">${digestData.summary}</div>`;
+    }
+
+    // 2. Attention Items (Red)
+    if (digestData.attention_items && digestData.attention_items.length > 0) {
+        digestData.attention_items.forEach(item => {
+            html += createDigestCard({
+                type: 'attention',
+                icon: 'warning',
+                title: item.title,
+                desc: item.description,
+                footer: `Severity: ${item.severity || 'Attention'}`
+            });
+        });
+    }
+
+    // 3. Observations (Blue)
+    if (digestData.observations && digestData.observations.length > 0) {
+        digestData.observations.forEach(item => {
+            html += createDigestCard({
+                type: 'observation',
+                icon: 'analytics',
+                title: item.title,
+                desc: item.description,
+                footer: item.trend ? `Trend: ${item.trend}` : null
+            });
+        });
+    }
+
+    // 4. Positives (Green)
+    if (digestData.positives && digestData.positives.length > 0) {
+        // Group positives into one card if they are simple strings
+        const listItems = digestData.positives.map(p => `<li>${p}</li>`).join('');
+        html += createDigestCard({
+            type: 'positive',
+            icon: 'check_circle',
+            title: 'All Good',
+            desc: `<ul style="padding-left: 1.25rem; margin: 0;">${listItems}</ul>`
+        });
+    }
+
+    // 5. Tip (Gold)
+    if (digestData.tip) {
+        html += createDigestCard({
+            type: 'tip',
+            icon: 'lightbulb',
+            title: 'Tip of the Day',
+            desc: digestData.tip
+        });
+    }
+
+    return html;
+}
+
+function createDigestCard({ type, icon, title, desc, footer }) {
+    const iconSvg = getIconSvg(icon);
+
+    return `
+    <div class="digest-card-item digest-card-${type}">
+        <div class="digest-card-header">
+            <div class="digest-card-icon">${iconSvg}</div>
+            <div class="digest-card-title">${title}</div>
+        </div>
+        <div class="digest-card-desc">${desc}</div>
+        ${footer ? `<div class="digest-card-footer">${footer}</div>` : ''}
+    </div>
+    `;
+}
+
+function getIconSvg(name) {
+    const icons = {
+        'warning': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`,
+        'analytics': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2v-3h2v3zm4 0h-2v-5h2v5z"/></svg>`,
+        'check_circle': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`,
+        'lightbulb': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6A4.997 4.997 0 0 1 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/></svg>`
+    };
+    return icons[name] || icons['analytics'];
+}
+
+// Fallback for legacy data/errors
 function markdownToHtml(markdown) {
+    if (!markdown) return '';
     return markdown
-        // Headers
         .replace(/^### (.*$)/gim, '<h3>$1</h3>')
         .replace(/^## (.*$)/gim, '<h2>$1</h2>')
         .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-        // Bold
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        // Italic
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        // Lists
         .replace(/^\- (.*$)/gim, '<li>$1</li>')
-        // Line breaks
-        .replace(/\n\n/g, '</p><p>')
-        .replace(/\n/g, '<br>')
-        // Wrap in paragraph
-        .replace(/^(.*)$/, '<p>$1</p>')
-        // Horizontal rule
-        .replace(/---/g, '<hr>');
+        .replace(/\n/g, '<br>');
 }
 
 // Make loadFullDigest available globally for onclick handlers

@@ -822,6 +822,156 @@ body {
 }
 
 /* ============================================
+   Digest Grid & Cards
+   ============================================ */
+
+.digest-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+[data-layout="morning-pages"] .digest-grid {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Base Digest Card */
+.digest-card-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.digest-card-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.digest-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.25rem;
+}
+
+.digest-card-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.digest-card-title {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+.digest-card-desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.digest-card-footer {
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ⚠️ NEEDS ATTENTION (Critical) */
+.digest-card-attention {
+    background: rgba(220, 90, 90, 0.08);
+    /* Red tint */
+    border-color: rgba(220, 90, 90, 0.3);
+}
+
+.digest-card-attention .digest-card-icon {
+    color: var(--danger);
+}
+
+.digest-card-attention .digest-card-title {
+    color: #ffcccc;
+}
+
+/* 📊 OBSERVATIONS (Blue/Neutral) */
+.digest-card-observation {
+    background: rgba(90, 140, 220, 0.05);
+    /* Blue tint */
+    border-color: rgba(90, 140, 220, 0.2);
+}
+
+.digest-card-observation .digest-card-icon {
+    color: #6ab4ff;
+}
+
+/* ✅ POSITIVES (Green) */
+.digest-card-positive {
+    background: rgba(84, 184, 122, 0.05);
+    /* Green tint */
+    border-color: rgba(84, 184, 122, 0.2);
+}
+
+.digest-card-positive .digest-card-icon {
+    color: var(--success);
+}
+
+/* 💡 TIP (Gold/Accent) */
+.digest-card-tip {
+    background: rgba(220, 170, 90, 0.05);
+    /* Gold tint */
+    border-color: rgba(220, 170, 90, 0.2);
+    grid-column: 1 / -1;
+    /* Tip usually spans full width */
+}
+
+.digest-card-tip .digest-card-icon {
+    color: var(--warning);
+}
+
+/* Summary Section */
+.digest-summary-block {
+    grid-column: 1 / -1;
+    background: var(--bg-primary);
+    border: 1px solid var(--accent);
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius);
+    text-align: center;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    font-family: var(--font-heading);
+}
+}
+
+.btn-secondary {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ============================================
    Actions Card
    ============================================ */
 
