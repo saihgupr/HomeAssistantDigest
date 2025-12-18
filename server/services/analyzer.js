@@ -3,6 +3,7 @@ const { getProfile } = require('../db/profile');
 const { getMonitoredEntities, getEntityStats } = require('../db/entities');
 const { addDigest, getLatestDigest } = require('../db/digests');
 const { getAddonHealthReport, getAutomationHealthReport, getIntegrationHealthReport } = require('./homeassistant');
+const { getBatteryPredictions } = require('./predictions');
 
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
@@ -56,8 +57,17 @@ async function generateDigest(type = 'daily') {
         console.error('[Digest] Failed to get integration report:', error.message);
     }
 
+    // Fetch battery predictions
+    let batteryPredictions = [];
+    try {
+        batteryPredictions = await getBatteryPredictions();
+        console.log(`[Digest] Battery predictions: ${batteryPredictions.length} batteries tracked`);
+    } catch (error) {
+        console.error('[Digest] Failed to get battery predictions:', error.message);
+    }
+
     // Build the prompt
-    const prompt = buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport, automationReport, integrationReport);
+    const prompt = buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport, automationReport, integrationReport, batteryPredictions);
 
     // Call Gemini API
     const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
@@ -117,7 +127,7 @@ async function generateDigest(type = 'daily') {
 /**
  * Build the analysis prompt for Gemini
  */
-function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport = null, automationReport = null, integrationReport = null) {
+function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport = null, automationReport = null, integrationReport = null, batteryPredictions = []) {
     const periodLabel = type === 'weekly' ? 'past week' : 'past 24 hours';
 
     // Detect first-run scenario (no snapshot data yet)
@@ -206,6 +216,20 @@ ${intSummary.join('\n')}
 `;
     }
 
+    // Build battery predictions section
+    let batterySection = '';
+    if (batteryPredictions.length > 0) {
+        const batteryLines = batteryPredictions.map(b => {
+            const warning = b.needs_attention ? ' ⚠️ NEEDS ATTENTION' : '';
+            return `- ${b.friendly_name}: ${b.current_level}% (draining ~${b.drain_rate_per_day}%/day, ~${b.days_remaining} days remaining)${warning}`;
+        });
+
+        batterySection = `
+## Battery Predictions
+${batteryLines.join('\n')}
+`;
+    }
+
     // First-run specific instructions
     const firstRunInstructions = isFirstRun ? `
 ## IMPORTANT: First Run Scenario
@@ -230,7 +254,7 @@ ${profile.concerns ? `- Concerns: ${profile.concerns}` : ''}
 
 ## Entity Overview
 Total monitored: ${entities.length} entities across ${entityStats.length} categories
-${addonSection}${automationSection}${integrationSection}
+${addonSection}${automationSection}${integrationSection}${batterySection}
 ## Data from ${periodLabel}
 ${entitySummaries.length > 0 ? entitySummaries.join('\\n') : 'No snapshot data available yet - this is expected for a new setup.'}
 
