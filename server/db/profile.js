@@ -48,13 +48,13 @@ function getProfileValue(key) {
 function setProfileValue(key, value) {
     const db = getDb();
     const jsonValue = typeof value === 'string' ? value : JSON.stringify(value);
+
+    // Use REPLACE INTO for better compatibility
     db.run(`
-        INSERT INTO profile (key, value, updated_at) 
+        REPLACE INTO profile (key, value, updated_at) 
         VALUES (?, ?, datetime('now'))
-        ON CONFLICT(key) DO UPDATE SET 
-            value = excluded.value,
-            updated_at = datetime('now')
     `, [key, jsonValue]);
+
     saveDatabase();
 }
 
@@ -64,15 +64,21 @@ function setProfileValue(key, value) {
 function setProfile(profileData) {
     const db = getDb();
 
-    for (const [key, value] of Object.entries(profileData)) {
-        const jsonValue = typeof value === 'string' ? value : JSON.stringify(value);
-        db.run(`
-            INSERT INTO profile (key, value, updated_at) 
-            VALUES (?, ?, datetime('now'))
-            ON CONFLICT(key) DO UPDATE SET 
-                value = excluded.value,
-                updated_at = datetime('now')
-        `, [key, jsonValue]);
+    // Use transaction if available (sql.js works in-memory so strictly not needed but good practice)
+    db.exec('BEGIN TRANSACTION');
+    try {
+        for (const [key, value] of Object.entries(profileData)) {
+            const jsonValue = typeof value === 'string' ? value : JSON.stringify(value);
+            db.run(`
+                REPLACE INTO profile (key, value, updated_at) 
+                VALUES (?, ?, datetime('now'))
+            `, [key, jsonValue]);
+        }
+        db.exec('COMMIT');
+    } catch (error) {
+        db.exec('ROLLBACK');
+        console.error('Transaction failed:', error);
+        throw error;
     }
 
     saveDatabase();

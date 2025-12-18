@@ -88,9 +88,10 @@ function setupEventListeners() {
     const generateDigestBtn = document.getElementById('generate-digest');
     const testNotificationBtn = document.getElementById('test-notification');
 
-    if (startSetupBtn) {
-        startSetupBtn.addEventListener('click', handleStartSetup);
-    }
+    // startSetupBtn is handled dynamically in updateUIState
+    // if (startSetupBtn) {
+    //     startSetupBtn.addEventListener('click', handleStartSetup);
+    // }
     if (generateDigestBtn) {
         generateDigestBtn.addEventListener('click', handleGenerateDigest);
     }
@@ -105,7 +106,7 @@ function setupEventListeners() {
 
 async function loadStatus() {
     try {
-        const response = await fetch('api/status');
+        const response = await fetch(`api/status?t=${Date.now()}`);
         const status = await response.json();
         updateUIState(status);
     } catch (error) {

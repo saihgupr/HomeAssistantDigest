@@ -1,4 +1,4 @@
-const SUPERVISOR_TOKEN = process.env.SUPERVISOR_TOKEN;
+const SUPERVISOR_TOKEN = process.env.SUPERVISOR_TOKEN || process.env.HASSIO_TOKEN;
 const HA_URL = 'http://supervisor/core';
 
 /**
@@ -6,6 +6,13 @@ const HA_URL = 'http://supervisor/core';
  */
 async function haRequest(endpoint, options = {}) {
     const url = `${HA_URL}${endpoint}`;
+
+    console.log(`[HA Request] Making request to: ${url}`);
+    if (!SUPERVISOR_TOKEN) {
+        console.error('[HA Request] SUPERVISOR_TOKEN is missing!');
+    } else {
+        console.log(`[HA Request] Token present (length: ${SUPERVISOR_TOKEN.length})`);
+    }
 
     const response = await fetch(url, {
         ...options,

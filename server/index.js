@@ -17,6 +17,12 @@ const PORT = process.env.PORT || 8099;
 // Parse JSON bodies
 app.use(express.json());
 
+// Disable caching for API routes
+app.use('/api', (req, res, next) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    next();
+});
+
 // Serve static UI files
 app.use(express.static(path.join(__dirname, '..', 'ui')));
 
@@ -40,9 +46,14 @@ app.get('/api/health', (req, res) => {
 app.get('/api/status', (req, res) => {
     try {
         const profile = getProfile();
+        const complete = isProfileComplete();
+        const configured = !!process.env.GEMINI_API_KEY;
+
+        console.log(`Status Check - Configured: ${configured}, Complete: ${complete}, Keys: ${Object.keys(profile).join(',')}`);
+
         res.json({
-            configured: !!process.env.GEMINI_API_KEY,
-            profileComplete: isProfileComplete(),
+            configured,
+            profileComplete: complete,
             digestTime: process.env.DIGEST_TIME || '07:00',
             historyDays: parseInt(process.env.HISTORY_DAYS) || 7,
             snapshotInterval: parseInt(process.env.SNAPSHOT_INTERVAL_MINUTES) || 30,

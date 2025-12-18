@@ -44,6 +44,7 @@ function saveDatabase() {
         const data = db.export();
         const buffer = Buffer.from(data);
         fs.writeFileSync(DB_PATH, buffer);
+        console.log(`[DB] Saved database to ${DB_PATH} (${buffer.length} bytes)`);
     }
 }
 

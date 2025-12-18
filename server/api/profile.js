@@ -88,6 +88,7 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
     try {
         const profileData = req.body;
+        console.log('Received profile data:', JSON.stringify(profileData, null, 2));
 
         if (!profileData || typeof profileData !== 'object') {
             return res.status(400).json({ error: 'Invalid profile data' });
@@ -95,9 +96,13 @@ router.post('/', (req, res) => {
 
         setProfile(profileData);
 
+        const complete = isProfileComplete();
+        console.log('Profile complete status:', complete);
+        console.log('Current profile keys:', Object.keys(getProfile()));
+
         res.json({
             success: true,
-            isComplete: isProfileComplete()
+            isComplete: complete
         });
     } catch (error) {
         console.error('Failed to save profile:', error);
