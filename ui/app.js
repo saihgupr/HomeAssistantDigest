@@ -78,9 +78,11 @@ async function loadDigestForType(type) {
 
         const digestCard = document.getElementById('digest-card');
         const digestContent = document.getElementById('digest-content');
+        const digestGrid = document.getElementById('digest-grid');
         const digestTimestamp = document.getElementById('digest-timestamp');
         const historyCard = document.getElementById('history-card');
         const digestList = document.getElementById('digest-list');
+        const summaryBlock = document.querySelector('.summary-block');
 
         if (data.digests && data.digests.length > 0) {
             // Display latest digest of this type
@@ -102,20 +104,30 @@ async function loadDigestForType(type) {
                     <div class="digest-list-item" onclick="loadFullDigest(${digest.id})">
                         <span class="digest-date">${new Date(digest.timestamp).toLocaleDateString()}</span>
                         <span class="digest-summary">${digest.summary || 'No summary'}</span>
-                        <span class="digest-attention ${digest.attention_count > 0 ? 'warning' : ''}">${digest.attention_count} items</span>
+                        <span class="digest-attention ${digest.attention_count > 0 ? 'warning' : ''}}">${digest.attention_count} items</span>
                     </div>
                 `).join('');
             } else {
                 historyCard.classList.add('hidden');
             }
         } else {
-            // No digests of this type yet
+            // No digests of this type yet - show clean empty state
             digestCard.classList.remove('hidden');
             digestTimestamp.textContent = `No ${type} digests yet`;
+
+            // Hide the summary block and grid, show empty message
+            if (summaryBlock) summaryBlock.style.display = 'none';
+            if (digestGrid) {
+                digestGrid.style.display = 'none';
+                digestGrid.innerHTML = '';
+            }
+            digestContent.style.display = 'block';
             digestContent.innerHTML = `
                 <div class="empty-state">
-                    <p>You haven't generated any ${type} digests yet.</p>
-                    <p>Click "Generate Digest" to create your first ${type} digest.</p>
+                    <div class="empty-icon">📊</div>
+                    <h3>No ${type} digests yet</h3>
+                    <p>Click "Generate Digest Now" above to create your first ${type} report.</p>
+                    ${type === 'weekly' ? '<p class="empty-hint">Weekly digests analyze 7 days of data for trends and patterns.</p>' : ''}
                 </div>
             `;
             historyCard.classList.add('hidden');

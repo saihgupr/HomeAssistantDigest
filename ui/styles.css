@@ -1162,9 +1162,30 @@ body {
 
 .empty-state {
     text-align: center;
-    padding: 2rem;
+    padding: 3rem 2rem;
     color: var(--text-muted);
-    font-style: italic;
+}
+
+.empty-state .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.6;
+}
+
+.empty-state h3 {
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.empty-state p {
+    margin: 0.25rem 0;
+}
+
+.empty-state .empty-hint {
+    font-size: 0.85rem;
+    margin-top: 1rem;
+    opacity: 0.7;
 }
 
 /* ============================================
