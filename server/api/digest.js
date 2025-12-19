@@ -68,14 +68,15 @@ router.post('/generate-and-notify', async (req, res) => {
 
 /**
  * GET /api/digest/list
- * Get list of past digests
+ * Get list of past digests with optional type filter
  */
 router.get('/list', (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || 10;
         const offset = parseInt(req.query.offset) || 0;
+        const type = req.query.type || null; // 'daily', 'weekly', or null for all
 
-        const digests = getDigests(limit, offset);
+        const digests = getDigests(limit, offset, type);
         const stats = getDigestStats();
 
         res.json({ digests, stats });

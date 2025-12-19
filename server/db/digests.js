@@ -38,6 +38,28 @@ function getLatestDigest() {
 }
 
 /**
+ * Get the most recent digest of a specific type
+ */
+function getLatestDigestByType(type) {
+    const db = getDb();
+    const result = db.exec(`
+        SELECT id, timestamp, type, content, summary, attention_count, notification_sent
+        FROM digests
+        WHERE type = ?
+        ORDER BY timestamp DESC
+        LIMIT 1
+    `, [type]);
+
+    if (result.length === 0 || result[0].values.length === 0) return null;
+
+    const columns = result[0].columns;
+    const row = result[0].values[0];
+    const digest = {};
+    columns.forEach((col, i) => digest[col] = row[i]);
+    return digest;
+}
+
+/**
  * Get digest by ID
  */
 function getDigest(id) {
@@ -55,16 +77,26 @@ function getDigest(id) {
 }
 
 /**
- * Get all digests with pagination
+ * Get all digests with pagination and optional type filter
  */
-function getDigests(limit = 10, offset = 0) {
+function getDigests(limit = 10, offset = 0, type = null) {
     const db = getDb();
-    const result = db.exec(`
+
+    let query = `
         SELECT id, timestamp, type, summary, attention_count, notification_sent
         FROM digests
-        ORDER BY timestamp DESC
-        LIMIT ? OFFSET ?
-    `, [limit, offset]);
+    `;
+    let params = [];
+
+    if (type) {
+        query += ` WHERE type = ?`;
+        params.push(type);
+    }
+
+    query += ` ORDER BY timestamp DESC LIMIT ? OFFSET ?`;
+    params.push(limit, offset);
+
+    const result = db.exec(query, params);
 
     if (result.length === 0) return [];
 
@@ -124,6 +156,7 @@ function deleteOldDigests(beforeDate) {
 module.exports = {
     addDigest,
     getLatestDigest,
+    getLatestDigestByType,
     getDigest,
     getDigests,
     markNotificationSent,

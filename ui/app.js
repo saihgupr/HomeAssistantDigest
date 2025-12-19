@@ -63,7 +63,66 @@ function setDigestView(digestType) {
         btn.classList.toggle('active', btn.dataset.digestType === digestType);
     });
 
-    // TODO: Filter digest display by type when implemented
+    // Store current type globally
+    window.currentDigestType = digestType;
+
+    // Reload digest display for the selected type
+    loadDigestForType(digestType);
+}
+
+async function loadDigestForType(type) {
+    try {
+        // Load digests filtered by type
+        const response = await fetch(`api/digest/list?limit=10&type=${type}`);
+        const data = await response.json();
+
+        const digestCard = document.getElementById('digest-card');
+        const digestContent = document.getElementById('digest-content');
+        const digestTimestamp = document.getElementById('digest-timestamp');
+        const historyCard = document.getElementById('history-card');
+        const digestList = document.getElementById('digest-list');
+
+        if (data.digests && data.digests.length > 0) {
+            // Display latest digest of this type
+            const latest = data.digests[0];
+            digestCard.classList.remove('hidden');
+
+            if (latest.timestamp) {
+                const date = new Date(latest.timestamp);
+                digestTimestamp.textContent = date.toLocaleString();
+            }
+
+            // Load full content if we have an ID
+            await loadFullDigest(latest.id);
+
+            // Display history
+            if (data.digests.length > 1) {
+                historyCard.classList.remove('hidden');
+                digestList.innerHTML = data.digests.slice(1).map(digest => `
+                    <div class="digest-list-item" onclick="loadFullDigest(${digest.id})">
+                        <span class="digest-date">${new Date(digest.timestamp).toLocaleDateString()}</span>
+                        <span class="digest-summary">${digest.summary || 'No summary'}</span>
+                        <span class="digest-attention ${digest.attention_count > 0 ? 'warning' : ''}">${digest.attention_count} items</span>
+                    </div>
+                `).join('');
+            } else {
+                historyCard.classList.add('hidden');
+            }
+        } else {
+            // No digests of this type yet
+            digestCard.classList.remove('hidden');
+            digestTimestamp.textContent = `No ${type} digests yet`;
+            digestContent.innerHTML = `
+                <div class="empty-state">
+                    <p>You haven't generated any ${type} digests yet.</p>
+                    <p>Click "Generate Digest" to create your first ${type} digest.</p>
+                </div>
+            `;
+            historyCard.classList.add('hidden');
+        }
+    } catch (error) {
+        console.error('Failed to load digests for type:', error);
+    }
 }
 
 
@@ -269,8 +328,9 @@ async function loadFullDigest(digestId) {
 }
 
 async function loadDigestHistory() {
+    const type = window.currentDigestType || 'daily';
     try {
-        const response = await fetch('api/digest/list?limit=5');
+        const response = await fetch(`api/digest/list?limit=5&type=${type}`);
         const data = await response.json();
 
         if (data.digests && data.digests.length > 1) {
@@ -303,14 +363,19 @@ async function handleStartSetup() {
 async function handleGenerateDigest() {
     const btn = document.getElementById('generate-digest');
     const actionStatus = document.getElementById('action-status');
+    const digestType = window.currentDigestType || 'daily';
 
     btn.disabled = true;
-    btn.textContent = 'Generating...';
-    actionStatus.textContent = 'Calling Gemini AI to analyze your smart home...';
+    btn.textContent = `Generating ${digestType}...`;
+    actionStatus.textContent = `Calling Gemini AI to analyze your smart home (${digestType} digest)...`;
     actionStatus.className = 'action-status info';
 
     try {
-        const response = await fetch('api/digest/generate', { method: 'POST' });
+        const response = await fetch('api/digest/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: digestType })
+        });
         const data = await response.json();
 
         if (data.success) {
@@ -463,7 +528,7 @@ function createDigestCard({ type, icon, title, desc, footer }) {
 
     // Add dismiss button for attention/warning cards
     const dismissBtn = (type === 'attention')
-        ? `<button class="dismiss-btn" onclick="dismissWarning('${title.replace(/'/g, "\\'")}')">Dismiss</button>`
+        ? `<button class="dismiss-btn" onclick="dismissWarning('${title.replace(/'/g, "\\'")}')">Ignore</button>`
         : '';
 
     return `
