@@ -274,7 +274,7 @@ ${logLines.join('\n')}
         } else {
             logSection = `
 ## Logs
-No significant errors or warnings found in recent logs.
+Log analysis complete. No critical errors or warnings found in the recent logs.
 `;
         }
     }
@@ -318,32 +318,40 @@ Analyze the data and return a JSON object with the following structure:
       "description": "Brief explanation of why this is a concern (1-2 sentences).",
       "severity": "critical" | "warning",
       "detailed_info": {
-        "explanation": "More detailed explanation of what's happening and why it matters.",
+        "explanation": "Detailed explanation of the issue.",
         "affected_entities": ["entity.id_1", "entity.id_2"],
-        "suggestions": ["First suggestion to fix", "Second suggestion"],
-        "troubleshooting": "Step-by-step troubleshooting guidance if applicable."
+        "suggestions": ["Specific actionable suggestion 1", "Suggestion 2"],
+        "troubleshooting": "Troubleshooting steps if applicable."
       }
     }
   ],
   "observations": [
     {
-      "title": "Short title",
-      "description": "Interesting pattern or trend noticed.",
-      "trend": "improving" | "stable" | "degrading"
+      "title": "Observation Title",
+      "description": "Interesting pattern, trend, or anomaly noticed in the data.",
+      "trend": "improving" | "stable" | "degrading" | "neutral"
     }
   ],
   "positives": [
-    "List of things working well",
-    "List of normal patterns"
+    "Specific thing working well",
+    "Positive trend noticed"
   ],
-  "tip": "One actionable tip for the user."
+  "tip": "A specific, actionable tip derived from the data analysis (e.g., 'Hallway light was on for 4 hours', 'Unused entity found'). Avoid generic advice."
 }
 
-Ensure the "attention_items" array is empty if there are no issues. Be VERY strict about what constitutes an issue:
-- Batteries above 30% are FINE - do not flag as warnings
-- Normal operating conditions are not issues - only flag actual malfunctions or critical thresholds
-- Don't be alarmist about minor variations or things that are "lower than others" but still healthy
-- Only include attention_items for things that genuinely need user action NOW
+Guidelines for analysis:
+- **Attention Items**: Focus on active problems, errors, or critical thresholds.
+- **Observations**: Include non-critical but notable findings. Examples:
+  - "Living room temp is higher than average."
+  - "Bedroom light was left on during the day."
+  - "Security system was armed later than usual."
+- **Positives**: Highlight stability or improvements.
+- **Tip**: MUST be specific to the home's actual data. Look for:
+  - Entities that never change state (candidates for removal?)
+  - High energy consumers (if data available)
+  - Unusual patterns
+  - If no specific data insight, provide a generic but advanced Home Assistant tip.
+
 ${dismissedWarnings.length > 0 ? `
 ## DISMISSED WARNINGS - DO NOT INCLUDE THESE:
 The user has dismissed the following warnings. DO NOT include any attention_items with these titles or similar topics:
