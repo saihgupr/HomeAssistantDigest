@@ -535,6 +535,206 @@ async function getIntegrationHealthReport() {
     }
 }
 
+// ============================================
+// LOG ANALYSIS FUNCTIONS
+// ============================================
+
+/**
+ * Make a request for plain text logs (not JSON)
+ */
+async function supervisorLogRequest(endpoint, lines = 100) {
+    const url = `${SUPERVISOR_URL}${endpoint}`;
+
+    const response = await fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${SUPERVISOR_TOKEN}`,
+            'Accept': 'text/plain',
+            'Range': `entries=:-${lines}:` // Get last N entries
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error(`Supervisor Log API error: ${response.status} ${response.statusText}`);
+    }
+
+    return response.text();
+}
+
+/**
+ * Get Home Assistant Core logs
+ */
+async function getCoreLogs(lines = 200) {
+    try {
+        const logs = await supervisorLogRequest('/core/logs', lines);
+        return logs;
+    } catch (error) {
+        console.error('[Logs] Failed to get core logs:', error.message);
+        return null;
+    }
+}
+
+/**
+ * Get Supervisor logs
+ */
+async function getSupervisorLogs(lines = 100) {
+    try {
+        const logs = await supervisorLogRequest('/supervisor/logs', lines);
+        return logs;
+    } catch (error) {
+        console.error('[Logs] Failed to get supervisor logs:', error.message);
+        return null;
+    }
+}
+
+/**
+ * Get add-on logs
+ */
+async function getAddonLogs(slug, lines = 100) {
+    try {
+        const logs = await supervisorLogRequest(`/addons/${slug}/logs`, lines);
+        return logs;
+    } catch (error) {
+        console.error(`[Logs] Failed to get logs for ${slug}:`, error.message);
+        return null;
+    }
+}
+
+/**
+ * Analyze logs for errors, warnings, and notable events
+ */
+function analyzeLogContent(logText, source = 'unknown') {
+    if (!logText) return { errors: [], warnings: [], notable: [] };
+
+    const lines = logText.split('\n').filter(line => line.trim());
+    const errors = [];
+    const warnings = [];
+    const notable = [];
+
+    // Patterns to look for
+    const errorPatterns = [
+        /\bERROR\b/i,
+        /\bException\b/,
+        /\bFailed\b/i,
+        /\bCritical\b/i,
+        /\bFatal\b/i
+    ];
+
+    const warningPatterns = [
+        /\bWARNING\b/i,
+        /\bWARN\b/i,
+        /\bDeprecated\b/i,
+        /\bTimeout\b/i,
+        /\bRetrying\b/i
+    ];
+
+    const notablePatterns = [
+        /\bRestarting\b/i,
+        /\bStopped\b/i,
+        /\bStarted\b/i,
+        /\bUpdating\b/i,
+        /\bMigrating\b/i
+    ];
+
+    // Track unique messages to avoid duplicates
+    const seenErrors = new Set();
+    const seenWarnings = new Set();
+
+    for (const line of lines) {
+        // Skip empty or very short lines
+        if (line.length < 10) continue;
+
+        // Extract a simplified message (first 150 chars)
+        const simplifiedMsg = line.substring(0, 150).trim();
+
+        // Check for errors
+        if (errorPatterns.some(p => p.test(line))) {
+            // Create a dedup key from the first part of the message
+            const dedupKey = simplifiedMsg.substring(0, 80);
+            if (!seenErrors.has(dedupKey) && errors.length < 10) {
+                seenErrors.add(dedupKey);
+                errors.push({
+                    source,
+                    message: simplifiedMsg,
+                    full: line.substring(0, 500)
+                });
+            }
+        }
+        // Check for warnings
+        else if (warningPatterns.some(p => p.test(line))) {
+            const dedupKey = simplifiedMsg.substring(0, 80);
+            if (!seenWarnings.has(dedupKey) && warnings.length < 10) {
+                seenWarnings.add(dedupKey);
+                warnings.push({
+                    source,
+                    message: simplifiedMsg
+                });
+            }
+        }
+        // Check for notable events
+        else if (notablePatterns.some(p => p.test(line)) && notable.length < 5) {
+            notable.push({
+                source,
+                message: simplifiedMsg
+            });
+        }
+    }
+
+    return { errors, warnings, notable };
+}
+
+/**
+ * Get comprehensive log health report for digest analysis
+ */
+async function getLogHealthReport() {
+    const report = {
+        errors: [],
+        warnings: [],
+        notable: [],
+        summary: '',
+        analyzed: false
+    };
+
+    try {
+        // Get core logs (most important)
+        const coreLogs = await getCoreLogs(300);
+        if (coreLogs) {
+            const coreAnalysis = analyzeLogContent(coreLogs, 'Home Assistant Core');
+            report.errors.push(...coreAnalysis.errors);
+            report.warnings.push(...coreAnalysis.warnings);
+            report.notable.push(...coreAnalysis.notable);
+        }
+
+        // Get supervisor logs
+        const supervisorLogs = await getSupervisorLogs(100);
+        if (supervisorLogs) {
+            const supAnalysis = analyzeLogContent(supervisorLogs, 'Supervisor');
+            report.errors.push(...supAnalysis.errors);
+            report.warnings.push(...supAnalysis.warnings);
+        }
+
+        // Limit to top issues
+        report.errors = report.errors.slice(0, 10);
+        report.warnings = report.warnings.slice(0, 10);
+        report.notable = report.notable.slice(0, 5);
+
+        // Build summary
+        if (report.errors.length === 0 && report.warnings.length === 0) {
+            report.summary = 'No significant errors or warnings found in logs.';
+        } else {
+            report.summary = `Found ${report.errors.length} errors and ${report.warnings.length} warnings in logs.`;
+        }
+
+        report.analyzed = true;
+        console.log(`[Logs] Analysis complete: ${report.errors.length} errors, ${report.warnings.length} warnings`);
+
+    } catch (error) {
+        console.error('[Logs] Failed to analyze logs:', error.message);
+        report.summary = 'Unable to analyze logs - may require additional permissions.';
+    }
+
+    return report;
+}
+
 module.exports = {
     haRequest,
     supervisorRequest,
@@ -557,5 +757,10 @@ module.exports = {
     getSupervisorInfo,
     // Automation & Integration health
     getAutomationHealthReport,
-    getIntegrationHealthReport
+    getIntegrationHealthReport,
+    // Log analysis
+    getCoreLogs,
+    getSupervisorLogs,
+    getAddonLogs,
+    getLogHealthReport
 };

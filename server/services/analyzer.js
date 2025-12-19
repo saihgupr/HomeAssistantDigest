@@ -2,7 +2,7 @@ const { getAllSnapshotsForAnalysis } = require('../db/snapshots');
 const { getProfile } = require('../db/profile');
 const { getMonitoredEntities, getEntityStats } = require('../db/entities');
 const { addDigest, getLatestDigest } = require('../db/digests');
-const { getAddonHealthReport, getAutomationHealthReport, getIntegrationHealthReport } = require('./homeassistant');
+const { getAddonHealthReport, getAutomationHealthReport, getIntegrationHealthReport, getLogHealthReport } = require('./homeassistant');
 const { getBatteryPredictions } = require('./predictions');
 const { getDismissedWarnings } = require('../db/dismissed');
 
@@ -67,12 +67,21 @@ async function generateDigest(type = 'daily') {
         console.error('[Digest] Failed to get battery predictions:', error.message);
     }
 
+    // Fetch log health report
+    let logReport = null;
+    try {
+        logReport = await getLogHealthReport();
+        console.log(`[Digest] Log report: ${logReport.errors.length} errors, ${logReport.warnings.length} warnings`);
+    } catch (error) {
+        console.error('[Digest] Failed to get log report:', error.message);
+    }
+
     // Get dismissed warnings to filter from output
     const dismissedWarnings = getDismissedWarnings();
     console.log(`[Digest] ${dismissedWarnings.length} dismissed warnings to filter`);
 
     // Build the prompt
-    const prompt = buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport, automationReport, integrationReport, batteryPredictions, dismissedWarnings);
+    const prompt = buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport, automationReport, integrationReport, batteryPredictions, dismissedWarnings, logReport);
 
     // Call Gemini API
     const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
@@ -132,7 +141,7 @@ async function generateDigest(type = 'daily') {
 /**
  * Build the analysis prompt for Gemini
  */
-function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport = null, automationReport = null, integrationReport = null, batteryPredictions = [], dismissedWarnings = []) {
+function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport = null, automationReport = null, integrationReport = null, batteryPredictions = [], dismissedWarnings = [], logReport = null) {
     const periodLabel = type === 'weekly' ? 'past week' : 'past 24 hours';
 
     // Detect first-run scenario (no snapshot data yet)
@@ -235,6 +244,35 @@ ${batteryLines.join('\n')}
 `;
     }
 
+    // Build log analysis section
+    let logSection = '';
+    if (logReport && logReport.analyzed) {
+        const logLines = [];
+        if (logReport.errors.length > 0) {
+            logLines.push(`### Recent Errors (${logReport.errors.length})`);
+            logReport.errors.slice(0, 5).forEach(e => {
+                logLines.push(`- [${e.source}] ${e.message}`);
+            });
+        }
+        if (logReport.warnings.length > 0) {
+            logLines.push(`### Recent Warnings (${logReport.warnings.length})`);
+            logReport.warnings.slice(0, 5).forEach(w => {
+                logLines.push(`- [${w.source}] ${w.message}`);
+            });
+        }
+        if (logLines.length > 0) {
+            logSection = `
+## Recent Log Issues
+${logLines.join('\n')}
+`;
+        } else {
+            logSection = `
+## Logs
+No significant errors or warnings found in recent logs.
+`;
+        }
+    }
+
     // First-run specific instructions
     const firstRunInstructions = isFirstRun ? `
 ## IMPORTANT: First Run Scenario
@@ -259,7 +297,7 @@ ${profile.concerns ? `- Concerns: ${profile.concerns}` : ''}
 
 ## Entity Overview
 Total monitored: ${entities.length} entities across ${entityStats.length} categories
-${addonSection}${automationSection}${integrationSection}${batterySection}
+${addonSection}${automationSection}${integrationSection}${batterySection}${logSection}
 ## Data from ${periodLabel}
 ${entitySummaries.length > 0 ? entitySummaries.join('\\n') : 'No snapshot data available yet - this is expected for a new setup.'}
 

@@ -3,7 +3,7 @@
 ## Features & Enhancements
 
 ### Log Analysis
-- [ ] Add log analysis to the digest - currently it does not look at HA logs
+- [x] Add log analysis to the digest - analyzes HA Core and Supervisor logs for errors/warnings
 
 ### Info Button / More Details
 - [x] Add an info button that pops up a "more info" window for each issue
