@@ -124,7 +124,6 @@ async function loadDigestForType(type) {
             digestContent.style.display = 'block';
             digestContent.innerHTML = `
                 <div class="empty-state">
-                    <div class="empty-icon">📊</div>
                     <h3>No ${type} digests yet</h3>
                     <p>Click "Generate Digest Now" above to create your first ${type} report.</p>
                     ${type === 'weekly' ? '<p class="empty-hint">Weekly digests analyze 7 days of data for trends and patterns.</p>' : ''}
