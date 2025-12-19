@@ -562,7 +562,10 @@ function renderDigestCards(digestData) {
     if (digestData.summary) {
         html += `
             <div class="digest-summary-block">
-                <div class="summary-block-label">System Insight</div>
+                <div class="summary-block-label">
+                    ${getIconSvg('analytics')}
+                    <span>System Insight</span>
+                </div>
                 <div class="summary-block-text">${digestData.summary}</div>
             </div>
         `;

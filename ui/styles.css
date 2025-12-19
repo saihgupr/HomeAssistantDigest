@@ -1033,32 +1033,39 @@ body {
     background: rgba(84, 184, 122, 0.08);
     border: 1px solid var(--success);
     padding: 1.25rem;
-    padding-top: 2rem;
     border-radius: var(--radius);
     color: var(--text-primary);
     margin-bottom: 0;
-    /* Remove double spacing, rely on grid gap */
     position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
 .summary-block-label {
-    position: absolute;
-    top: 0.75rem;
-    left: 1.25rem;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--success);
+    /* Match usage of .digest-card-title */
+    font-size: 1rem;
     font-weight: 600;
-    opacity: 0.9;
+    color: var(--success);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.summary-block-label svg {
+    width: 24px;
+    height: 24px;
+    color: currentColor;
+    flex-shrink: 0;
 }
 
 .summary-block-text {
-    text-align: center;
-    font-size: 1.05rem;
-    font-family: var(--font-heading);
+    /* Match usage of .digest-card-desc but slightly prioritized */
+    text-align: left;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
     margin: 0;
-    line-height: 1.5;
 }
 
 .digest-quick-overview {
