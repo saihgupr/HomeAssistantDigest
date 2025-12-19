@@ -256,17 +256,15 @@ function updateUIState(status) {
     const isFullyConfigured = status.configured && status.profileComplete && status.entitiesDiscovered;
 
     // Show/hide cards based on state
+    // Show/hide cards based on state
     const setupCard = document.getElementById('setup-card');
-    const actionsCard = document.getElementById('actions-card');
     const digestCard = document.getElementById('digest-card');
 
     if (isFullyConfigured) {
         setupCard.classList.add('hidden');
-        actionsCard.classList.remove('hidden');
         digestCard.classList.remove('hidden');
     } else {
         setupCard.classList.remove('hidden');
-        actionsCard.classList.add('hidden');
         digestCard.classList.add('hidden');
 
         // Update step styling based on progress
