@@ -6,31 +6,24 @@
 - [ ] Add log analysis to the digest - currently it does not look at HA logs
 
 ### Info Button / More Details
-- [ ] Add an info button that pops up a "more info" window for each issue
-  - Example: For "Disabled Automations", the info window should provide more context to help users make fixes
-  - Should include troubleshooting tips, related entities, and potential solutions
+- [x] Add an info button that pops up a "more info" window for each issue
+  - Shows severity, detailed explanation, affected entities, suggestions, and troubleshooting
+  - Modal can be closed by clicking outside, X button, or Escape key
 
 ### Better Information Organization
-- [ ] Reorganize information hierarchy for better UX:
+- [x] Reorganize information hierarchy for better UX:
   - Quick overview/assessment at the top with easy-to-read summary info
   - Then critical issues
   - Then less critical issues
-- [ ] Add "All Good" summary section at the top showing positive status items:
-  - Majority of add-ons running smoothly (X out of Y)
-  - Most automations enabled and active (X out of Y)
-  - Network connectivity stable
-  - Backup processes successful and up-to-date
-  - Device batteries at healthy levels
-  - AdGuard Home Protection enabled
-  - Zigbee2MQTT bridge connection stable
+- [x] Add "Quick Overview" summary section at the top showing positive status items
 
 ### Next Digest Display
-- [ ] Fix "NEXT DIGEST" display in Weekly tab - should show day of week (e.g., "Monday") instead of time "07:00"
-- [ ] Fix "NEXT DIGEST" display in Daily tab - should show proper next run time
+- [x] Fix "NEXT DIGEST" display in Weekly tab - now shows day of week (e.g., "Sunday") instead of time
+- [x] Fix "NEXT DIGEST" display in Daily tab - shows proper next run time
 
 ### Tab Switching Issues
-- [ ] Fix issue where switching from Weekly to Daily tab requires a page refresh to see the digest
-- [ ] Ensure digest content updates dynamically when switching between tabs
+- [x] Fix issue where switching from Weekly to Daily tab requires a page refresh to see the digest
+- [x] Ensure digest content updates dynamically when switching between tabs
 
 ### Notifications
 - [ ] Document/implement when notifications get sent out
@@ -45,8 +38,8 @@
 
 ## Bugs
 
-- [ ] Weekly tab shows "07:00" instead of day of week for next digest
-- [ ] Daily/Weekly tab switching doesn't refresh content without page reload
+- [x] Weekly tab shows "07:00" instead of day of week for next digest - FIXED
+- [x] Daily/Weekly tab switching doesn't refresh content without page reload - FIXED
 
 ## Questions to Answer
 

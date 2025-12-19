@@ -140,13 +140,15 @@ function stopScheduler() {
  */
 function getSchedulerStatus() {
     const digestTime = process.env.DIGEST_TIME || '07:00';
+    const weeklyDay = process.env.WEEKLY_DIGEST_DAY || 'sunday';
     return {
         isRunning,
         snapshotInterval: parseInt(process.env.SNAPSHOT_INTERVAL_MINUTES) || 30,
         digestTime,
+        weeklyDay,
         nextSnapshot: snapshotJob ? 'Scheduled' : 'Not scheduled',
         nextDigest: digestJob ? `Daily at ${digestTime}` : 'Not scheduled',
-        nextWeeklyDigest: weeklyDigestJob ? `Sundays at ${digestTime}` : 'Not scheduled',
+        nextWeeklyDigest: weeklyDigestJob ? `${weeklyDay.charAt(0).toUpperCase() + weeklyDay.slice(1)}s at ${digestTime}` : 'Not scheduled',
         nextCleanup: cleanupJob ? 'Daily at 3 AM' : 'Not scheduled'
     };
 }

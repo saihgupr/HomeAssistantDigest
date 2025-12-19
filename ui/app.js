@@ -66,6 +66,9 @@ function setDigestView(digestType) {
     // Store current type globally
     window.currentDigestType = digestType;
 
+    // Update "Next Digest" display based on selected type
+    updateNextDigestDisplay(digestType);
+
     // Reload digest display for the selected type
     loadDigestForType(digestType);
 }
@@ -83,6 +86,12 @@ async function loadDigestForType(type) {
         const historyCard = document.getElementById('history-card');
         const digestList = document.getElementById('digest-list');
         const summaryBlock = document.querySelector('.summary-block');
+
+        // Reset display state before loading new content
+        digestGrid.innerHTML = '';
+        digestGrid.style.display = '';
+        digestContent.style.display = 'none';
+        if (summaryBlock) summaryBlock.style.display = '';
 
         if (data.digests && data.digests.length > 0) {
             // Display latest digest of this type
@@ -136,6 +145,25 @@ async function loadDigestForType(type) {
     }
 }
 
+/**
+ * Update the "Next Digest" display based on selected tab type
+ */
+function updateNextDigestDisplay(digestType) {
+    const nextDigestEl = document.getElementById('next-digest');
+    if (!nextDigestEl || !window.schedulerInfo) return;
+
+    const scheduler = window.schedulerInfo;
+
+    if (digestType === 'weekly') {
+        // Show day of week for weekly digest
+        const weeklyDay = scheduler.weeklyDay || 'sunday';
+        const capitalizedDay = weeklyDay.charAt(0).toUpperCase() + weeklyDay.slice(1);
+        nextDigestEl.textContent = capitalizedDay;
+    } else {
+        // Show time for daily digest
+        nextDigestEl.textContent = scheduler.digestTime || '07:00';
+    }
+}
 
 // ============================================
 // Date Display
@@ -216,7 +244,12 @@ function updateUIState(status) {
     if (status.scheduler) {
         schedulerStatus.textContent = status.scheduler.isRunning ? 'Running' : 'Stopped';
         schedulerStatus.className = `value ${status.scheduler.isRunning ? 'success' : 'warning'}`;
-        nextDigest.textContent = status.scheduler.digestTime || '--:--';
+
+        // Store scheduler info globally for use by tab switcher
+        window.schedulerInfo = status.scheduler;
+
+        // Update next digest based on current tab
+        updateNextDigestDisplay(window.currentDigestType || 'daily');
     }
 
     // Simplified: fully configured = API key + profile done (entities auto-configure)
@@ -483,20 +516,33 @@ function renderDigestCards(digestData) {
         html += `<div class="digest-summary-block">${digestData.summary}</div>`;
     }
 
-    // 2. Attention Items (Red)
+    // 2. Quick Overview - Positives at the top (Green) for quick glance
+    if (digestData.positives && digestData.positives.length > 0) {
+        const listItems = digestData.positives.map(p => `<li>${p}</li>`).join('');
+        html += createDigestCard({
+            type: 'positive',
+            icon: 'check_circle',
+            title: 'Quick Overview',
+            desc: `<ul style="padding-left: 1.25rem; margin: 0;">${listItems}</ul>`
+        });
+    }
+
+    // 3. Attention Items (Red) - Critical issues after overview
     if (digestData.attention_items && digestData.attention_items.length > 0) {
-        digestData.attention_items.forEach(item => {
+        digestData.attention_items.forEach((item, idx) => {
             html += createDigestCard({
                 type: 'attention',
                 icon: 'warning',
                 title: item.title,
                 desc: item.description,
-                footer: `Severity: ${item.severity || 'Attention'}`
+                footer: `Severity: ${item.severity || 'Attention'}`,
+                detailedInfo: item.detailed_info,
+                itemId: `attention-${idx}`
             });
         });
     }
 
-    // 3. Observations (Blue)
+    // 4. Observations (Blue)
     if (digestData.observations && digestData.observations.length > 0) {
         digestData.observations.forEach(item => {
             html += createDigestCard({
@@ -509,19 +555,7 @@ function renderDigestCards(digestData) {
         });
     }
 
-    // 4. Positives (Green)
-    if (digestData.positives && digestData.positives.length > 0) {
-        // Group positives into one card if they are simple strings
-        const listItems = digestData.positives.map(p => `<li>${p}</li>`).join('');
-        html += createDigestCard({
-            type: 'positive',
-            icon: 'check_circle',
-            title: 'All Good',
-            desc: `<ul style="padding-left: 1.25rem; margin: 0;">${listItems}</ul>`
-        });
-    }
-
-    // 5. Tip (Gold)
+    // 5. Tip (Gold) - Actionable tip at the end
     if (digestData.tip) {
         html += createDigestCard({
             type: 'tip',
@@ -534,7 +568,7 @@ function renderDigestCards(digestData) {
     return html;
 }
 
-function createDigestCard({ type, icon, title, desc, footer }) {
+function createDigestCard({ type, icon, title, desc, footer, detailedInfo, itemId }) {
     const iconSvg = getIconSvg(icon);
 
     // Add dismiss button for attention/warning cards
@@ -542,11 +576,22 @@ function createDigestCard({ type, icon, title, desc, footer }) {
         ? `<button class="dismiss-btn" onclick="dismissWarning('${title.replace(/'/g, "\\'")}')">Ignore</button>`
         : '';
 
+    // Add info button for attention cards with detailed info
+    const infoBtn = (type === 'attention' && detailedInfo)
+        ? `<button class="info-btn" onclick="showIssueDetails('${itemId}')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>Info</button>`
+        : '';
+
+    // Store detailed info in a data attribute for the modal
+    const dataAttr = (detailedInfo && itemId)
+        ? `data-item-id="${itemId}" data-detailed='${JSON.stringify(detailedInfo).replace(/'/g, "&#39;")}'`
+        : '';
+
     return `
-    <div class="digest-card-item digest-card-${type}">
+    <div class="digest-card-item digest-card-${type}" ${dataAttr}>
         <div class="digest-card-header">
             <div class="digest-card-icon">${iconSvg}</div>
             <div class="digest-card-title">${title}</div>
+            ${infoBtn}
             ${dismissBtn}
         </div>
         <div class="digest-card-desc">${desc}</div>
@@ -612,3 +657,100 @@ function markdownToHtml(markdown) {
 
 // Make loadFullDigest available globally for onclick handlers
 window.loadFullDigest = loadFullDigest;
+
+/**
+ * Show issue details in a modal popup
+ */
+function showIssueDetails(itemId) {
+    const card = document.querySelector(`[data-item-id="${itemId}"]`);
+    if (!card) return;
+
+    const title = card.querySelector('.digest-card-title')?.textContent || 'Issue Details';
+    const severity = card.querySelector('.digest-card-footer')?.textContent?.replace('Severity: ', '') || 'warning';
+
+    let detailedInfo = {};
+    try {
+        const dataStr = card.dataset.detailed;
+        if (dataStr) {
+            detailedInfo = JSON.parse(dataStr.replace(/&#39;/g, "'"));
+        }
+    } catch (e) {
+        console.error('Failed to parse detailed info:', e);
+    }
+
+    // Build modal content
+    const modalHtml = `
+    <div class="modal-overlay active" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3>${title}</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h4>Severity</h4>
+                    <span class="modal-severity ${severity.toLowerCase()}">${severity}</span>
+                </div>
+                ${detailedInfo.explanation ? `
+                <div class="modal-section">
+                    <h4>Details</h4>
+                    <p>${detailedInfo.explanation}</p>
+                </div>
+                ` : ''}
+                ${detailedInfo.affected_entities && detailedInfo.affected_entities.length > 0 ? `
+                <div class="modal-section">
+                    <h4>Affected Entities</h4>
+                    <div class="modal-entities">
+                        ${detailedInfo.affected_entities.map(e => `<span class="entity-tag">${e}</span>`).join('')}
+                    </div>
+                </div>
+                ` : ''}
+                ${detailedInfo.suggestions && detailedInfo.suggestions.length > 0 ? `
+                <div class="modal-section">
+                    <h4>Suggestions</h4>
+                    <ul>
+                        ${detailedInfo.suggestions.map(s => `<li>${s}</li>`).join('')}
+                    </ul>
+                </div>
+                ` : ''}
+                ${detailedInfo.troubleshooting ? `
+                <div class="modal-section">
+                    <h4>Troubleshooting</h4>
+                    <p>${detailedInfo.troubleshooting}</p>
+                </div>
+                ` : ''}
+            </div>
+        </div>
+    </div>
+    `;
+
+    // Remove existing modal if any
+    const existingModal = document.querySelector('.modal-overlay');
+    if (existingModal) existingModal.remove();
+
+    // Add modal to body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+/**
+ * Close the modal
+ */
+function closeModal(event) {
+    if (event && event.target !== event.currentTarget) return;
+    const modal = document.querySelector('.modal-overlay');
+    if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => modal.remove(), 300);
+    }
+}
+
+// Make modal functions available globally
+window.showIssueDetails = showIssueDetails;
+window.closeModal = closeModal;
+
+// Close modal on Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+});

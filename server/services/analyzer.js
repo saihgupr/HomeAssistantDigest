@@ -271,8 +271,14 @@ Analyze the data and return a JSON object with the following structure:
   "attention_items": [
     {
       "title": "Short title of issue",
-      "description": "Detailed explanation of why this is a concern.",
-      "severity": "critical" | "warning"
+      "description": "Brief explanation of why this is a concern (1-2 sentences).",
+      "severity": "critical" | "warning",
+      "detailed_info": {
+        "explanation": "More detailed explanation of what's happening and why it matters.",
+        "affected_entities": ["entity.id_1", "entity.id_2"],
+        "suggestions": ["First suggestion to fix", "Second suggestion"],
+        "troubleshooting": "Step-by-step troubleshooting guidance if applicable."
+      }
     }
   ],
   "observations": [
