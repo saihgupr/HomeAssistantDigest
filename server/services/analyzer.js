@@ -190,8 +190,14 @@ function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, ad
     // Build add-on summary
     let addonSection = '';
     if (addonReport && addonReport.total > 0) {
+        // Collect names of stopped add-ons for the prompt
+        const stoppedAddons = addonReport.addons
+            .filter(a => a.state !== 'started')
+            .map(a => a.name);
+
         const addonSummary = [
             `Total: ${addonReport.total} add-ons (${addonReport.running} running, ${addonReport.stopped} stopped)`,
+            stoppedAddons.length > 0 ? `Stopped add-ons: ${stoppedAddons.join(', ')}` : null,
             addonReport.updateAvailable > 0 ? `Updates available: ${addonReport.updateAvailable}` : null,
             ...addonReport.issues.map(i => `- ⚠️ ${i.addon}: ${i.issue}`)
         ].filter(Boolean);

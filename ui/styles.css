@@ -2365,6 +2365,13 @@ body {
     display: flex;
     align-items: center;
     gap: 0.25rem;
+    opacity: 0;
+    /* Hidden by default */
+}
+
+.digest-card-header:hover .info-btn {
+    opacity: 1;
+    /* Show on card hover */
 }
 
 .info-btn:hover {

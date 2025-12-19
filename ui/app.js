@@ -524,13 +524,20 @@ function renderDigestCards(digestData) {
     // 3. Attention Items (Red) - Critical issues after overview
     if (digestData.attention_items && digestData.attention_items.length > 0) {
         digestData.attention_items.forEach((item, idx) => {
+            // Ensure detailed info exists so the button always appears
+            const details = item.detailed_info || {
+                title: item.title,
+                explanation: item.description,
+                recommendation: "Check the entity in Home Assistant."
+            };
+
             html += createDigestCard({
                 type: 'attention',
                 icon: 'warning',
                 title: item.title,
                 desc: item.description,
                 footer: `Severity: ${item.severity || 'Attention'}`,
-                detailedInfo: item.detailed_info,
+                detailedInfo: details,
                 itemId: `attention-${idx}`
             });
         });
