@@ -185,7 +185,6 @@ function updateDateDisplay() {
 function setupEventListeners() {
     const startSetupBtn = document.getElementById('start-setup');
     const generateDigestBtn = document.getElementById('generate-digest');
-    const testNotificationBtn = document.getElementById('test-notification');
 
     // startSetupBtn is handled dynamically in updateUIState
     // if (startSetupBtn) {
@@ -193,9 +192,6 @@ function setupEventListeners() {
     // }
     if (generateDigestBtn) {
         generateDigestBtn.addEventListener('click', handleGenerateDigest);
-    }
-    if (testNotificationBtn) {
-        testNotificationBtn.addEventListener('click', handleTestNotification);
     }
 }
 
@@ -466,28 +462,7 @@ async function handleGenerateDigest() {
     }
 }
 
-async function handleTestNotification() {
-    const actionStatus = document.getElementById('action-status');
 
-    actionStatus.textContent = 'Sending test notification...';
-    actionStatus.className = 'action-status info';
-
-    try {
-        const response = await fetch('api/digest/test-notification', { method: 'POST' });
-        const data = await response.json();
-
-        if (data.success) {
-            actionStatus.textContent = 'Test notification sent!';
-            actionStatus.className = 'action-status success';
-        } else {
-            throw new Error(data.error || 'Failed to send notification');
-        }
-    } catch (error) {
-        console.error('Test notification error:', error);
-        actionStatus.textContent = `Error: ${error.message}`;
-        actionStatus.className = 'action-status error';
-    }
-}
 
 // ============================================
 // Markdown Parser
