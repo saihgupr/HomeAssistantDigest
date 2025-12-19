@@ -511,19 +511,15 @@ function renderDigestCards(digestData) {
 
     let html = '';
 
-    // 1. Summary Block
-    if (digestData.summary) {
-        html += `<div class="digest-summary-block">${digestData.summary}</div>`;
-    }
-
-    // 2. Quick Overview - Positives at the top (Green) for quick glance
+    // 1. Quick Overview - Positives at the top (full width)
     if (digestData.positives && digestData.positives.length > 0) {
         const listItems = digestData.positives.map(p => `<li>${p}</li>`).join('');
         html += createDigestCard({
             type: 'positive',
             icon: 'check_circle',
             title: 'Quick Overview',
-            desc: `<ul style="padding-left: 1.25rem; margin: 0;">${listItems}</ul>`
+            desc: `<ul style="padding-left: 1.25rem; margin: 0;">${listItems}</ul>`,
+            className: 'digest-card-full'
         });
     }
 
@@ -555,20 +551,38 @@ function renderDigestCards(digestData) {
         });
     }
 
-    // 5. Tip (Gold) - Actionable tip at the end
+    // 4. All Good Items (Green) - Things working well
+    if (digestData.good_items && digestData.good_items.length > 0) {
+        digestData.good_items.forEach(item => {
+            html += createDigestCard({ type: 'good', icon: 'check_circle', title: 'All Good', desc: item });
+        });
+    }
+
+    // 5. Summary Block - Now explicitly at the bottom above the tip
+    if (digestData.summary) {
+        html += `
+            <div class="digest-summary-block">
+                <div class="summary-block-label">System Insight</div>
+                <div class="summary-block-text">${digestData.summary}</div>
+            </div>
+        `;
+    }
+
+    // 6. Tip (Gold) - Actionable tip at the end
     if (digestData.tip) {
         html += createDigestCard({
             type: 'tip',
             icon: 'lightbulb',
             title: 'Tip of the Day',
-            desc: digestData.tip
+            desc: digestData.tip,
+            className: 'digest-card-full'
         });
     }
 
     return html;
 }
 
-function createDigestCard({ type, icon, title, desc, footer, detailedInfo, itemId }) {
+function createDigestCard({ type, icon, title, desc, footer, detailedInfo, itemId, className = '' }) {
     const iconSvg = getIconSvg(icon);
 
     // Add dismiss button for attention/warning cards
@@ -587,7 +601,7 @@ function createDigestCard({ type, icon, title, desc, footer, detailedInfo, itemI
         : '';
 
     return `
-    <div class="digest-card-item digest-card-${type}" ${dataAttr}>
+    <div class="digest-card-item digest-card-${type} ${className}" ${dataAttr}>
         <div class="digest-card-header">
             <div class="digest-card-icon">${iconSvg}</div>
             <div class="digest-card-title">${title}</div>

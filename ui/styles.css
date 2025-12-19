@@ -900,6 +900,10 @@ body {
 }
 
 /* Base Digest Card */
+.digest-card-full {
+    grid-column: 1 / -1;
+}
+
 .digest-card-item {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border);
@@ -1000,15 +1004,14 @@ body {
     color: #6ab4ff;
 }
 
-/* ✅ POSITIVES (Green) */
+/* ✅ POSITIVES / QUICK OVERVIEW (Blue - Swapped per request) */
 .digest-card-positive {
-    background: rgba(84, 184, 122, 0.05);
-    /* Green tint */
-    border-color: rgba(84, 184, 122, 0.2);
+    background: linear-gradient(135deg, rgba(100, 150, 255, 0.08) 0%, rgba(100, 150, 255, 0.02) 100%);
+    border-color: var(--accent);
 }
 
 .digest-card-positive .digest-card-icon {
-    color: var(--success);
+    color: var(--accent);
 }
 
 /* 💡 TIP (Gold/Accent) */
@@ -1024,18 +1027,77 @@ body {
     color: var(--warning);
 }
 
-/* Summary Section */
+/* Summary Section (Green - Swapped per request) */
 .digest-summary-block {
     grid-column: 1 / -1;
-    background: linear-gradient(135deg, rgba(100, 150, 255, 0.08) 0%, rgba(100, 150, 255, 0.02) 100%);
-    border: 1px solid var(--accent);
-    padding: 1rem 1.5rem;
+    background: rgba(84, 184, 122, 0.08);
+    border: 1px solid var(--success);
+    padding: 1.25rem 1.5rem;
     border-radius: var(--radius);
-    text-align: center;
-    font-size: 1.1rem;
     color: var(--text-primary);
     margin-bottom: 1rem;
+    position: relative;
+    padding-top: 2rem;
+}
+
+.summary-block-label {
+    position: absolute;
+    top: 0.75rem;
+    left: 1.5rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--success);
+    font-weight: 600;
+    opacity: 0.9;
+}
+
+.summary-block-text {
+    text-align: center;
+    font-size: 1.05rem;
     font-family: var(--font-heading);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.digest-quick-overview {
+    background: rgba(100, 200, 130, 0.08);
+    border: 1px solid rgba(100, 200, 130, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 0.5rem;
+}
+
+.quick-overview-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--success);
+    margin-bottom: 0.75rem;
+}
+
+.quick-overview-header svg {
+    width: 18px;
+    height: 18px;
+    fill: var(--success);
+}
+
+.digest-quick-overview ul {
+    margin: 0;
+    padding-left: 1.25rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.digest-quick-overview li {
+    margin-bottom: 0.25rem;
+}
+
+.digest-quick-overview li:last-child {
+    margin-bottom: 0;
 }
 
 .btn-secondary {
