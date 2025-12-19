@@ -475,6 +475,175 @@ async function getAutomationHealthReport() {
 }
 
 /**
+ * Get system update report - checks for available updates to HA Core, OS, Supervisor, and add-ons
+ */
+async function getUpdateReport() {
+    const report = {
+        hasUpdates: false,
+        updates: [],
+        summary: ''
+    };
+
+    try {
+        // Get Core update info
+        const coreInfo = await supervisorRequest('/core/info');
+        if (coreInfo.data) {
+            const core = coreInfo.data;
+            if (core.update_available) {
+                report.hasUpdates = true;
+                report.updates.push({
+                    name: 'Home Assistant Core',
+                    type: 'core',
+                    current: core.version,
+                    available: core.version_latest,
+                    severity: 'info'
+                });
+            }
+        }
+
+        // Get Supervisor update info
+        const supInfo = await supervisorRequest('/supervisor/info');
+        if (supInfo.data) {
+            const sup = supInfo.data;
+            if (sup.update_available) {
+                report.hasUpdates = true;
+                report.updates.push({
+                    name: 'Home Assistant Supervisor',
+                    type: 'supervisor',
+                    current: sup.version,
+                    available: sup.version_latest,
+                    severity: 'info'
+                });
+            }
+        }
+
+        // Get OS update info
+        const osInfo = await supervisorRequest('/os/info');
+        if (osInfo.data) {
+            const os = osInfo.data;
+            if (os.update_available) {
+                report.hasUpdates = true;
+                report.updates.push({
+                    name: 'Home Assistant OS',
+                    type: 'os',
+                    current: os.version,
+                    available: os.version_latest,
+                    severity: 'info'
+                });
+            }
+        }
+
+        // Add-on updates are already covered in getAddonHealthReport
+        // But we can summarize here
+        const addons = await getAddons();
+        const addonUpdates = addons.filter(a => a.update_available);
+        if (addonUpdates.length > 0) {
+            report.hasUpdates = true;
+            for (const addon of addonUpdates.slice(0, 5)) { // Limit to 5 to avoid noise
+                report.updates.push({
+                    name: addon.name,
+                    type: 'addon',
+                    current: addon.version,
+                    available: addon.version_latest,
+                    severity: 'info'
+                });
+            }
+            if (addonUpdates.length > 5) {
+                report.updates.push({
+                    name: `...and ${addonUpdates.length - 5} more add-ons`,
+                    type: 'addon',
+                    severity: 'info'
+                });
+            }
+        }
+
+        // Build summary
+        if (report.updates.length === 0) {
+            report.summary = 'All components are up to date.';
+        } else {
+            const coreUpdate = report.updates.find(u => u.type === 'core');
+            if (coreUpdate) {
+                report.summary = `Home Assistant ${coreUpdate.available} is available (current: ${coreUpdate.current}). `;
+            }
+            report.summary += `${report.updates.length} update(s) available.`;
+        }
+
+        console.log(`[Updates] ${report.updates.length} updates available`);
+
+    } catch (error) {
+        console.error('[Updates] Failed to check for updates:', error.message);
+        report.summary = 'Unable to check for updates.';
+    }
+
+    return report;
+}
+
+/**
+ * Get recently failed automations by checking automation traces
+ * This looks for automations that triggered but encountered errors
+ */
+async function getFailedAutomations() {
+    const report = {
+        failures: [],
+        checked: 0
+    };
+
+    try {
+        // Get all automation states first
+        const states = await getAllStates();
+        const automations = states.filter(e => e.entity_id.startsWith('automation.'));
+
+        // Check traces for each automation that has triggered recently
+        for (const auto of automations) {
+            if (!auto.attributes.last_triggered) continue;
+
+            const lastTriggered = new Date(auto.attributes.last_triggered);
+            const hoursSinceRun = (Date.now() - lastTriggered.getTime()) / (1000 * 60 * 60);
+
+            // Only check automations that ran in the last 24 hours
+            if (hoursSinceRun > 24) continue;
+
+            report.checked++;
+
+            try {
+                // Get traces for this automation
+                const tracesResponse = await haRequest('/api/trace/automation/' + auto.entity_id.split('.')[1]);
+                const traces = Array.isArray(tracesResponse) ? tracesResponse : [];
+
+                // Check the most recent traces for errors
+                for (const trace of traces.slice(0, 3)) { // Check last 3 traces
+                    if (trace.state === 'stopped' && trace.script_execution === 'error') {
+                        const traceTime = new Date(trace.timestamp);
+                        const hoursAgo = (Date.now() - traceTime.getTime()) / (1000 * 60 * 60);
+
+                        // Only report failures from last 24 hours
+                        if (hoursAgo <= 24) {
+                            report.failures.push({
+                                name: auto.attributes.friendly_name || auto.entity_id,
+                                entity_id: auto.entity_id,
+                                error_time: trace.timestamp,
+                                hours_ago: Math.round(hoursAgo),
+                                error: trace.error || 'Unknown error'
+                            });
+                            break; // Only report most recent failure per automation
+                        }
+                    }
+                }
+            } catch (traceError) {
+                // Trace API might not be available for all automations, skip silently
+            }
+        }
+
+        console.log(`[Automations] Checked ${report.checked} automations, found ${report.failures.length} failures`);
+
+    } catch (error) {
+        console.error('[Automations] Failed to check automation traces:', error.message);
+    }
+
+    return report;
+}
+
+/**
  * Get integration/config entry status
  */
 async function getIntegrationHealthReport() {
@@ -758,6 +927,9 @@ module.exports = {
     // Automation & Integration health
     getAutomationHealthReport,
     getIntegrationHealthReport,
+    // Updates & failed automations
+    getUpdateReport,
+    getFailedAutomations,
     // Log analysis
     getCoreLogs,
     getSupervisorLogs,

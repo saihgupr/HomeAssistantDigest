@@ -2,7 +2,7 @@ const { getAllSnapshotsForAnalysis } = require('../db/snapshots');
 const { getProfile } = require('../db/profile');
 const { getMonitoredEntities, getEntityStats } = require('../db/entities');
 const { addDigest, getLatestDigest } = require('../db/digests');
-const { getAddonHealthReport, getAutomationHealthReport, getIntegrationHealthReport, getLogHealthReport } = require('./homeassistant');
+const { getAddonHealthReport, getAutomationHealthReport, getIntegrationHealthReport, getLogHealthReport, getUpdateReport, getFailedAutomations } = require('./homeassistant');
 const { getBatteryPredictions } = require('./predictions');
 const { getDismissedWarnings } = require('../db/dismissed');
 
@@ -76,12 +76,30 @@ async function generateDigest(type = 'daily') {
         console.error('[Digest] Failed to get log report:', error.message);
     }
 
+    // Fetch update report
+    let updateReport = null;
+    try {
+        updateReport = await getUpdateReport();
+        console.log(`[Digest] Update report: ${updateReport.updates.length} updates available`);
+    } catch (error) {
+        console.error('[Digest] Failed to get update report:', error.message);
+    }
+
+    // Fetch failed automations
+    let failedAutomations = null;
+    try {
+        failedAutomations = await getFailedAutomations();
+        console.log(`[Digest] Failed automations: ${failedAutomations.failures.length} failures`);
+    } catch (error) {
+        console.error('[Digest] Failed to get failed automations:', error.message);
+    }
+
     // Get dismissed warnings to filter from output
     const dismissedWarnings = getDismissedWarnings();
     console.log(`[Digest] ${dismissedWarnings.length} dismissed warnings to filter`);
 
     // Build the prompt
-    const prompt = buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport, automationReport, integrationReport, batteryPredictions, dismissedWarnings, logReport);
+    const prompt = buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport, automationReport, integrationReport, batteryPredictions, dismissedWarnings, logReport, updateReport, failedAutomations);
 
     // Call Gemini API
     const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
@@ -141,7 +159,7 @@ async function generateDigest(type = 'daily') {
 /**
  * Build the analysis prompt for Gemini
  */
-function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport = null, automationReport = null, integrationReport = null, batteryPredictions = [], dismissedWarnings = [], logReport = null) {
+function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport = null, automationReport = null, integrationReport = null, batteryPredictions = [], dismissedWarnings = [], logReport = null, updateReport = null, failedAutomations = null) {
     const periodLabel = type === 'weekly' ? 'past week' : 'past 24 hours';
 
     // Detect first-run scenario (no snapshot data yet)
@@ -279,6 +297,36 @@ Log analysis complete. No critical errors or warnings found in the recent logs.
         }
     }
 
+    // Build update report section
+    let updateSection = '';
+    if (updateReport && updateReport.hasUpdates) {
+        const updateLines = updateReport.updates.map(u => {
+            if (u.current && u.available) {
+                return `- ${u.name}: ${u.current} -> ${u.available}`;
+            }
+            return `- ${u.name}`;
+        });
+
+        updateSection = `
+## Available Updates
+${updateLines.join('\n')}
+`;
+    }
+
+    // Build failed automations section
+    let failedAutoSection = '';
+    if (failedAutomations && failedAutomations.failures.length > 0) {
+        const failureLines = failedAutomations.failures.map(f =>
+            `- ${f.name}: Failed ${f.hours_ago}h ago - ${f.error}`
+        );
+
+        failedAutoSection = `
+## Failed Automations (Last 24h)
+The following automations triggered but encountered errors:
+${failureLines.join('\n')}
+`;
+    }
+
     // First-run specific instructions
     const firstRunInstructions = isFirstRun ? `
 ## IMPORTANT: First Run Scenario
@@ -303,7 +351,7 @@ ${profile.concerns ? `- Concerns: ${profile.concerns}` : ''}
 
 ## Entity Overview
 Total monitored: ${entities.length} entities across ${entityStats.length} categories
-${addonSection}${automationSection}${integrationSection}${batterySection}${logSection}
+${addonSection}${automationSection}${integrationSection}${batterySection}${logSection}${updateSection}${failedAutoSection}
 ## Data from ${periodLabel}
 ${entitySummaries.length > 0 ? entitySummaries.join('\\n') : 'No snapshot data available yet - this is expected for a new setup.'}
 
@@ -334,8 +382,10 @@ Analyze the data and return a JSON object with the following structure:
     }
   ],
   "positives": [
-    "Specific thing working well",
-    "Positive trend noticed"
+    {
+      "text": "Specific thing working well or system status",
+      "status": "good" | "info" | "warning"
+    }
   ],
   "tip": {
     "title": "One specific, actionable tip",

@@ -1151,6 +1151,51 @@ body {
     margin-bottom: 0;
 }
 
+/* Quick Overview List with Status Dots */
+.quick-overview-list {
+    margin: 0;
+    padding-left: 0;
+    list-style: none;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.quick-overview-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0.35rem;
+}
+
+.quick-overview-list li:last-child {
+    margin-bottom: 0;
+}
+
+/* Status Dots */
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 0.35rem;
+}
+
+.status-dot.status-good {
+    background: var(--success);
+    box-shadow: 0 0 4px rgba(40, 167, 69, 0.4);
+}
+
+.status-dot.status-info {
+    background: var(--info, #17a2b8);
+    box-shadow: 0 0 4px rgba(23, 162, 184, 0.4);
+}
+
+.status-dot.status-warning {
+    background: var(--warning);
+    box-shadow: 0 0 4px rgba(255, 193, 7, 0.4);
+}
+
 .btn-secondary {
     background: var(--bg-secondary);
     border: 1px solid var(--border);

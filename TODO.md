@@ -74,16 +74,16 @@ Priority order based on impact to user experience.
 **Problem**: Missing valuable insight categories that HA users care about.
 
 **Solution**:
-- [ ] **Failed automations**: Not just dormant, but ones that triggered and errored
-- [ ] **Update available**: Flag pending HA Core, add-on, or HACS updates
-- [ ] **Security events**: Unusual door/motion sensor activity overnight
-- [ ] **Energy trends**: "Used X% more electricity than last week" (if energy data available)
+- [x] Failed automations - check automation traces for errors
+- [x] Update available alerts (HA Core, add-ons pending updates)
+- [ ] Security events (unusual door/window activity patterns)
+- [ ] Energy consumption trends compared to previous period
 
 **Files**: `server/services/homeassistant.js` (new data sources), `server/services/analyzer.js` (prompt)
 
 ---
 
-### 6. Quick Overview Visual Indicators (Low Priority)
+### 6. Quick Overview Visual Indicators [DONE]
 
 **Problem**: Quick Overview is text-only; could be more scannable.
 

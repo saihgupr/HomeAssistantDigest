@@ -468,12 +468,20 @@ function renderDigestCards(digestData) {
 
     // 1. Quick Overview - Positives at the top (full width)
     if (digestData.positives && digestData.positives.length > 0) {
-        const listItems = digestData.positives.map(p => `<li>${p}</li>`).join('');
+        const listItems = digestData.positives.map(p => {
+            // Handle both string (legacy) and object (new) format
+            if (typeof p === 'string') {
+                return `<li><span class="status-dot status-good"></span>${p}</li>`;
+            }
+            const statusClass = p.status === 'warning' ? 'status-warning' :
+                p.status === 'info' ? 'status-info' : 'status-good';
+            return `<li><span class="status-dot ${statusClass}"></span>${p.text}</li>`;
+        }).join('');
         html += createDigestCard({
             type: 'positive',
             icon: 'check_circle',
             title: 'Quick Overview',
-            desc: `<ul style="padding-left: 1.25rem; margin: 0;">${listItems}</ul>`,
+            desc: `<ul class="quick-overview-list">${listItems}</ul>`,
             className: 'digest-card-full'
         });
     }
