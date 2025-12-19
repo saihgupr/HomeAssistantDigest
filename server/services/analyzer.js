@@ -316,7 +316,7 @@ Analyze the data and return a JSON object with the following structure:
     {
       "title": "Short title of issue",
       "description": "Brief explanation of why this is a concern (1-2 sentences).",
-      "severity": "critical" | "warning",
+      "severity": "critical" | "warning" | "data_quality",
       "detailed_info": {
         "explanation": "Detailed explanation of the issue.",
         "affected_entities": ["entity.id_1", "entity.id_2"],
@@ -329,28 +329,59 @@ Analyze the data and return a JSON object with the following structure:
     {
       "title": "Observation Title",
       "description": "Interesting pattern, trend, or anomaly noticed in the data.",
-      "trend": "improving" | "stable" | "degrading" | "neutral"
+      "trend": "improving" | "stable" | "degrading" | "neutral",
+      "actionable": true | false
     }
   ],
   "positives": [
     "Specific thing working well",
     "Positive trend noticed"
   ],
-  "tip": "A specific, actionable tip derived from the data analysis (e.g., 'Hallway light was on for 4 hours', 'Unused entity found'). Avoid generic advice."
+  "tip": {
+    "title": "One specific, actionable tip",
+    "action": "Exact action to take (e.g., 'Remove sensor.unused_device' or 'Create automation when motion detected after 11pm')",
+    "reason": "Why this would benefit the user"
+  }
 }
 
-Guidelines for analysis:
-- **Attention Items**: Focus on active problems, errors, or critical thresholds.
-- **Observations**: Include non-critical but notable findings. Examples:
-  - "Living room temp is higher than average."
-  - "Bedroom light was left on during the day."
-  - "Security system was armed later than usual."
-- **Positives**: Highlight stability or improvements.
-- **Tip**: MUST be specific to the home's actual data. Look for:
-  - Entities that never change state (candidates for removal?)
-  - High energy consumers (if data available)
-  - Unusual patterns
-  - If no specific data insight, provide a generic but advanced Home Assistant tip.
+## Guidelines for Analysis
+
+### Attention Items
+- Focus on ACTIVE problems, errors, or critical thresholds that need user action
+- Use "critical" for immediate risks (data loss, safety, system down)
+- Use "warning" for issues that need attention but aren't urgent
+- Use "data_quality" for sensor anomalies or reporting glitches (e.g., impossibly high values, stuck sensors)
+
+### Observations - QUALITY OVER QUANTITY
+IMPORTANT: Only include observations that meet ONE of these criteria:
+1. **Actionable**: User could reasonably do something about it
+2. **Changed**: Different from what would be expected or from previous patterns
+3. **Interesting**: Genuinely noteworthy trend or anomaly
+
+DO NOT include observations that are just:
+- "Entity X has been in state Y" (unless this is unexpected or problematic)
+- Lists of unused entities (save ONE for the tip instead)
+- Stable states that require no action
+- Generic facts about the system
+
+Aim for 2-4 HIGH-QUALITY observations, not many low-value ones.
+
+### Tip - ONE SPECIFIC ACTION
+The tip MUST be:
+- **Singular**: One tip only, not a list
+- **Specific**: Reference exact entity IDs or specific actions
+- **Actionable**: User can do it today
+- **Derived from data**: Based on what you analyzed, not generic advice
+
+Good examples:
+- "Remove 'sensor.old_thermostat' - it hasn't reported data in 7 days"
+- "Create an automation to turn off 'light.garage' after 30 minutes - it was left on for 6 hours yesterday"
+- "Battery in 'sensor.front_door' is at 15% - replace within the next week"
+
+Bad examples:
+- "Consider removing unused entities" (too vague)
+- "Review your automations" (not specific)
+- "sensor.a, sensor.b, sensor.c are unused" (that's a list, not a tip)
 
 ${dismissedWarnings.length > 0 ? `
 ## DISMISSED WARNINGS - DO NOT INCLUDE THESE:

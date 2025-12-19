@@ -535,11 +535,24 @@ function renderDigestCards(digestData) {
 
     // 6. Tip (Gold) - Actionable tip at the end
     if (digestData.tip) {
+        // Handle both old string format and new object format
+        let tipContent;
+        if (typeof digestData.tip === 'string') {
+            // Legacy: tip is just a string
+            tipContent = digestData.tip;
+        } else {
+            // New format: tip is an object with title, action, reason
+            tipContent = `
+                <strong>${digestData.tip.title || 'Tip'}</strong><br>
+                ${digestData.tip.action || ''}<br>
+                <em style="opacity: 0.8; font-size: 0.9em;">${digestData.tip.reason || ''}</em>
+            `;
+        }
         html += createDigestCard({
             type: 'tip',
             icon: 'lightbulb',
             title: 'Tip of the Day',
-            desc: digestData.tip,
+            desc: tipContent,
             className: 'digest-card-full'
         });
     }

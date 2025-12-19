@@ -2526,6 +2526,11 @@ body {
     color: var(--warning);
 }
 
+.modal-severity.data_quality {
+    background: rgba(150, 150, 170, 0.15);
+    color: var(--text-muted);
+}
+
 .modal-entities {
     display: flex;
     flex-wrap: wrap;
