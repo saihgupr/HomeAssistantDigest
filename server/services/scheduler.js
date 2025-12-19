@@ -7,6 +7,7 @@ const { markNotificationSent } = require('../db/digests');
 let snapshotJob = null;
 let cleanupJob = null;
 let digestJob = null;
+let weeklyDigestJob = null;
 let isRunning = false;
 
 /**
@@ -68,10 +69,32 @@ function startScheduler() {
         }
     });
 
+    // Schedule weekly digest on Sundays at the same time
+    const weeklyDigestCron = `${digestMinute} ${digestHour} * * 0`; // 0 = Sunday
+    weeklyDigestJob = cron.schedule(weeklyDigestCron, async () => {
+        console.log('[Scheduler] Generating weekly digest...');
+        try {
+            const digest = await generateDigest('weekly');
+            console.log(`[Scheduler] Weekly digest generated: ${digest.summary}`);
+
+            // Send notification
+            const notifyResult = await sendDigestNotification(digest);
+            if (notifyResult.success) {
+                markNotificationSent(digest.id);
+                console.log('[Scheduler] Weekly digest notification sent');
+            } else {
+                console.error('[Scheduler] Failed to send weekly notification:', notifyResult.error);
+            }
+        } catch (error) {
+            console.error('[Scheduler] Weekly digest generation failed:', error.message);
+        }
+    });
+
     isRunning = true;
     console.log(`Scheduler started:`);
     console.log(`  - Snapshots: every ${snapshotInterval} minutes`);
     console.log(`  - Daily digest: ${digestTime}`);
+    console.log(`  - Weekly digest: Sundays at ${digestTime}`);
     console.log(`  - Cleanup: 3:00 AM`);
 
     // Run initial collection after a short delay
@@ -101,6 +124,10 @@ function stopScheduler() {
         digestJob.stop();
         digestJob = null;
     }
+    if (weeklyDigestJob) {
+        weeklyDigestJob.stop();
+        weeklyDigestJob = null;
+    }
     isRunning = false;
     console.log('Scheduler stopped');
 }
@@ -116,6 +143,7 @@ function getSchedulerStatus() {
         digestTime,
         nextSnapshot: snapshotJob ? 'Scheduled' : 'Not scheduled',
         nextDigest: digestJob ? `Daily at ${digestTime}` : 'Not scheduled',
+        nextWeeklyDigest: weeklyDigestJob ? `Sundays at ${digestTime}` : 'Not scheduled',
         nextCleanup: cleanupJob ? 'Daily at 3 AM' : 'Not scheduled'
     };
 }
