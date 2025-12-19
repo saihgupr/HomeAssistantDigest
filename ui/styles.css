@@ -1032,18 +1032,19 @@ body {
     grid-column: 1 / -1;
     background: rgba(84, 184, 122, 0.08);
     border: 1px solid var(--success);
-    padding: 1.25rem 1.5rem;
+    padding: 1.25rem;
+    padding-top: 2rem;
     border-radius: var(--radius);
     color: var(--text-primary);
-    margin-bottom: 1rem;
+    margin-bottom: 0;
+    /* Remove double spacing, rely on grid gap */
     position: relative;
-    padding-top: 2rem;
 }
 
 .summary-block-label {
     position: absolute;
     top: 0.75rem;
-    left: 1.5rem;
+    left: 1.25rem;
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
