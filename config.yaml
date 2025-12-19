@@ -18,13 +18,15 @@ panel_icon: "mdi:newspaper-variant-outline"
 panel_title: "Digest"
 options:
   gemini_api_key: ""
-  digest_time: "07:00"
+  digest_time: "03:00"
+  weekly_digest_day: "sunday"
   notification_service: "persistent_notification"
   history_days: 7
   snapshot_interval_minutes: 30
 schema:
   gemini_api_key: str
   digest_time: str
+  weekly_digest_day: str
   notification_service: str
   history_days: int
   snapshot_interval_minutes: int

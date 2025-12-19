@@ -69,8 +69,11 @@ function startScheduler() {
         }
     });
 
-    // Schedule weekly digest on Sundays at the same time
-    const weeklyDigestCron = `${digestMinute} ${digestHour} * * 0`; // 0 = Sunday
+    // Schedule weekly digest on configurable day at the same time
+    const weeklyDay = process.env.WEEKLY_DIGEST_DAY || 'sunday';
+    const dayMap = { sunday: 0, monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6 };
+    const dayNum = dayMap[weeklyDay.toLowerCase()] ?? 0;
+    const weeklyDigestCron = `${digestMinute} ${digestHour} * * ${dayNum}`;
     weeklyDigestJob = cron.schedule(weeklyDigestCron, async () => {
         console.log('[Scheduler] Generating weekly digest...');
         try {
@@ -94,7 +97,7 @@ function startScheduler() {
     console.log(`Scheduler started:`);
     console.log(`  - Snapshots: every ${snapshotInterval} minutes`);
     console.log(`  - Daily digest: ${digestTime}`);
-    console.log(`  - Weekly digest: Sundays at ${digestTime}`);
+    console.log(`  - Weekly digest: ${weeklyDay}s at ${digestTime}`);
     console.log(`  - Cleanup: 3:00 AM`);
 
     // Run initial collection after a short delay

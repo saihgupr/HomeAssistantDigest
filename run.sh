@@ -30,6 +30,7 @@ fi
 
 export DATA_DIR=/data
 export DIGEST_TIME=$(jq -r '.digest_time' $CONFIG_PATH)
+export WEEKLY_DIGEST_DAY=$(jq -r '.weekly_digest_day' $CONFIG_PATH)
 export NOTIFICATION_SERVICE=$(jq -r '.notification_service' $CONFIG_PATH)
 export HISTORY_DAYS=$(jq -r '.history_days' $CONFIG_PATH)
 export SNAPSHOT_INTERVAL_MINUTES=$(jq -r '.snapshot_interval_minutes' $CONFIG_PATH)
