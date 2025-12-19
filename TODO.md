@@ -31,13 +31,6 @@
   - **Weekly digest**: Sent on configured `WEEKLY_DIGEST_DAY` (default Sunday) at same time
   - Uses configured `NOTIFICATION_SERVICE` (default: persistent_notification)
 
-### Alerts Tab (Future Feature)
-- [ ] Consider adding an "Alerts" tab that lists entities to add alerts for:
-  - Low HDD space
-  - Other system health items
-  - Could potentially replace manual automation alerts
-  - **Research needed**: Evaluate CPU usage for monitoring these entities
-
 ## Bugs
 
 - [x] Weekly tab shows "07:00" instead of day of week for next digest - FIXED
