@@ -26,8 +26,10 @@
 - [x] Ensure digest content updates dynamically when switching between tabs
 
 ### Notifications
-- [ ] Document/implement when notifications get sent out
-- [ ] Add notification scheduling configuration
+- [x] Document when notifications get sent out:
+  - **Daily digest**: Sent automatically at configured `DIGEST_TIME` (default 07:00)
+  - **Weekly digest**: Sent on configured `WEEKLY_DIGEST_DAY` (default Sunday) at same time
+  - Uses configured `NOTIFICATION_SERVICE` (default: persistent_notification)
 
 ### Alerts Tab (Future Feature)
 - [ ] Consider adding an "Alerts" tab that lists entities to add alerts for:
@@ -43,5 +45,5 @@
 
 ## Questions to Answer
 
-- [ ] When do notifications get sent out?
+- [x] When do notifications get sent out? - Documented above
 - [ ] What is the CPU impact of entity-based alerts monitoring?

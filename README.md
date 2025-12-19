@@ -27,6 +27,7 @@ Your smart home generates thousands of data points daily, but most go unnoticed 
 | **Pattern Breaks** | Motion sensor in a room that's usually active shows nothing all day |
 | **Integration Problems** | Failed automations, unavailable entities, API errors |
 | **System Health** | HA performance, add-on status, disk usage |
+| **Log Analysis** | Errors and warnings from HA Core and Supervisor logs |
 
 ---
 
@@ -102,6 +103,18 @@ It then identifies anomalies, trends, and concerns.
 - **Lightweight** — Minimal resource usage, won't slow down your HA
 
 ---
+
+## When Notifications Are Sent
+
+| Digest Type | Timing | Configuration |
+|-------------|--------|---------------|
+| **Daily** | Every day at configured time | `DIGEST_TIME` (default: `07:00`) |
+| **Weekly** | Once per week at same time | `WEEKLY_DIGEST_DAY` (default: `sunday`) |
+
+Notifications are sent automatically after each digest is generated using your configured `NOTIFICATION_SERVICE`:
+- **Persistent notification** (default) - Shows in HA sidebar
+- **Mobile app** - Push notification to your phone
+- **Any HA notify service** - Email, Telegram, etc.
 
 ## Installation
 
