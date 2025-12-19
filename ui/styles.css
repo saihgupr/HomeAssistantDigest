@@ -1080,7 +1080,7 @@ body {
     /* Match usage of .digest-card-title */
     font-size: 1rem;
     font-weight: 600;
-    color: var(--success);
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -1089,7 +1089,7 @@ body {
 .summary-block-label svg {
     width: 24px;
     height: 24px;
-    color: currentColor;
+    color: var(--success);
     flex-shrink: 0;
 }
 
