@@ -965,22 +965,31 @@ body {
     margin-left: auto;
     padding: 0.25rem 0.5rem;
     font-size: 0.7rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(100, 150, 255, 0.15);
+    /* Matched to info-btn */
+    border: 1px solid rgba(100, 150, 255, 0.3);
     border-radius: 4px;
-    color: var(--text-muted);
+    color: var(--accent);
     cursor: pointer;
     transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
     opacity: 0;
 }
 
-.digest-card-item:hover .dismiss-btn {
+.digest-card-header:hover .dismiss-btn {
     opacity: 1;
 }
 
 .dismiss-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(100, 150, 255, 0.25);
     color: var(--text-primary);
+}
+
+.dismiss-btn svg {
+    width: 12px;
+    height: 12px;
 }
 
 .digest-card-icon {
@@ -2353,7 +2362,8 @@ body {
    ============================================ */
 
 .info-btn {
-    margin-left: auto;
+    margin-left: 0.5rem;
+    /* Space between buttons if both present */
     padding: 0.25rem 0.5rem;
     font-size: 0.7rem;
     background: rgba(100, 150, 255, 0.15);
