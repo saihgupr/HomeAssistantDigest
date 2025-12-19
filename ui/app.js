@@ -103,22 +103,11 @@ async function loadDigestForType(type) {
                 digestTimestamp.textContent = date.toLocaleString();
             }
 
-            // Load full content if we have an ID
-            await loadFullDigest(latest.id);
+            // Cache digests for history navigation
+            window.digestsList = data.digests || [];
 
-            // Display history
-            if (data.digests.length > 1) {
-                historyCard.classList.remove('hidden');
-                digestList.innerHTML = data.digests.slice(1).map(digest => `
-                    <div class="digest-list-item" onclick="loadFullDigest(${digest.id})">
-                        <span class="digest-date">${new Date(digest.timestamp).toLocaleDateString()}</span>
-                        <span class="digest-summary">${digest.summary || 'No summary'}</span>
-                        <span class="digest-attention ${digest.attention_count > 0 ? 'warning' : ''}}">${digest.attention_count} items</span>
-                    </div>
-                `).join('');
-            } else {
-                historyCard.classList.add('hidden');
-            }
+            // Load full content if we have an ID (this will also trigger history sidebar update)
+            await loadFullDigest(latest.id);
         } else {
             // No digests of this type yet - show clean empty state
             digestCard.classList.remove('hidden');
@@ -350,6 +339,7 @@ function displayLatestDigest(digest) {
 }
 
 async function loadFullDigest(digestId) {
+    window.activeDigestId = digestId;
     try {
         const response = await fetch(`api/digest/${digestId}`);
         const data = await response.json();
@@ -359,6 +349,9 @@ async function loadFullDigest(digestId) {
             // Hide legacy content, show grid
             document.getElementById('digest-content').style.display = 'none';
             digestGrid.innerHTML = renderDigestCards(data.digest.content);
+
+            // Update history sidebar to reflect new active item
+            updateHistorySidebar();
         }
     } catch (error) {
         console.error('Failed to load full digest:', error);
@@ -371,20 +364,9 @@ async function loadDigestHistory() {
         const response = await fetch(`api/digest/list?limit=5&type=${type}`);
         const data = await response.json();
 
-        if (data.digests && data.digests.length > 1) {
-            const historyCard = document.getElementById('history-card');
-            const digestList = document.getElementById('digest-list');
-
-            historyCard.classList.remove('hidden');
-
-            digestList.innerHTML = data.digests.slice(1).map(digest => `
-                <div class="digest-list-item" onclick="loadFullDigest(${digest.id})">
-                    <span class="digest-date">${new Date(digest.timestamp).toLocaleDateString()}</span>
-                    <span class="digest-summary">${digest.summary || 'No summary'}</span>
-                    <span class="digest-attention ${digest.attention_count > 0 ? 'warning' : ''}">${digest.attention_count} items</span>
-                </div>
-            `).join('');
-        }
+        // Cache and render
+        window.digestsList = data.digests || [];
+        updateHistorySidebar();
     } catch (error) {
         console.error('Failed to load digest history:', error);
     }
@@ -754,3 +736,47 @@ window.closeModal = closeModal;
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeModal();
 });
+
+/**
+ * Update the history sidebar based on cached list and active ID
+ */
+function updateHistorySidebar() {
+    const historyCard = document.getElementById('history-card');
+    const digestList = document.getElementById('digest-list');
+    const digests = window.digestsList || [];
+
+    // Filter out the active digest
+    const filteredDigests = digests.filter(d => d.id !== window.activeDigestId);
+
+    if (filteredDigests.length > 0) {
+        historyCard.classList.remove('hidden');
+        digestList.innerHTML = renderDigestListItems(filteredDigests, digests); // Pass filtered and full list
+    } else {
+        historyCard.classList.add('hidden');
+    }
+}
+
+/**
+ * Render the list items HTML
+ */
+function renderDigestListItems(digestsToRender, allDigests) {
+    // Determine the ID of the "current/latest" digest (assumed to be the first one in the full list)
+    const latestId = (allDigests && allDigests.length > 0) ? allDigests[0].id : -1;
+
+    return digestsToRender.map(digest => {
+        const isCurrent = digest.id === latestId;
+        const dateStr = new Date(digest.timestamp).toLocaleDateString();
+
+        // Label logic: "Current" (bold, no date) or Date
+        const label = isCurrent ? `<strong>Current</strong>` : dateStr;
+        const highlightClass = isCurrent ? 'current-item' : '';
+
+        return `
+            <div class="digest-list-item ${highlightClass}" onclick="loadFullDigest(${digest.id})">
+                <span class="digest-date">${label}</span>
+                <span class="digest-summary">${digest.summary || 'No summary'}</span>
+                <span class="digest-attention ${digest.attention_count > 0 ? 'warning' : ''}">${digest.attention_count} items</span>
+            </div>
+        `;
+    }).join('');
+}
