@@ -150,7 +150,16 @@ function updateNextDigestDisplay(digestType) {
         nextDigestEl.textContent = capitalizedDay;
     } else {
         // Show time for daily digest
-        nextDigestEl.textContent = scheduler.digestTime || '07:00';
+        const timeStr = scheduler.digestTime || '07:00';
+        try {
+            // Parse HH:MM to date object for formatting
+            const [hours, minutes] = timeStr.split(':');
+            const d = new Date();
+            d.setHours(parseInt(hours), parseInt(minutes));
+            nextDigestEl.textContent = d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+        } catch (e) {
+            nextDigestEl.textContent = timeStr;
+        }
     }
 }
 
@@ -163,7 +172,7 @@ function updateDateDisplay() {
     if (dateEl) {
         const now = new Date();
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        dateEl.textContent = now.toLocaleDateString('en-US', options);
+        dateEl.textContent = now.toLocaleDateString(undefined, options);
     }
 }
 
@@ -797,7 +806,13 @@ function renderDigestListItems(digestsToRender, allDigests) {
     return digestsToRender.map(digest => {
         const isCurrent = digest.id === latestId;
         const d = new Date(digest.timestamp);
-        const dateStr = d.toLocaleDateString('en-US') + ' ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        const dateStr = d.toLocaleString(undefined, {
+            year: 'numeric',
+            month: 'numeric',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit'
+        });
 
         // Label logic: "Current" (bold, no date) or Date
         const label = isCurrent ? `<strong>Current</strong>` : dateStr;
