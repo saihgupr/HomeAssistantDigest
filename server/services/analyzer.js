@@ -182,20 +182,43 @@ function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, ad
         });
     }
 
-    // Build entity summary for the prompt
+    // Build entity summary for the prompt + detect data quality outliers
+    const dataQualityIssues = [];
+
     const entitySummaries = Object.entries(entityData).map(([entityId, data]) => {
         const values = data.values;
         if (values.length === 0) return null;
 
-        // For numeric values, calculate stats
+        // For numeric values, calculate stats and detect outliers
         const numericValues = values.filter(v => typeof v.value === 'number').map(v => v.value);
         let stats = '';
+        let outlierFlag = '';
 
         if (numericValues.length > 0) {
             const min = Math.min(...numericValues);
             const max = Math.max(...numericValues);
             const avg = numericValues.reduce((a, b) => a + b, 0) / numericValues.length;
-            stats = `min: ${min.toFixed(1)}, max: ${max.toFixed(1)}, avg: ${avg.toFixed(1)}`;
+
+            // Calculate standard deviation
+            const squaredDiffs = numericValues.map(v => Math.pow(v - avg, 2));
+            const avgSquaredDiff = squaredDiffs.reduce((a, b) => a + b, 0) / squaredDiffs.length;
+            const stdDev = Math.sqrt(avgSquaredDiff);
+
+            // Flag outliers (> 3 standard deviations from mean)
+            if (stdDev > 0) {
+                const outliers = numericValues.filter(v => Math.abs(v - avg) > 3 * stdDev);
+                if (outliers.length > 0) {
+                    outlierFlag = ' ⚠️ POSSIBLE DATA QUALITY ISSUE';
+                    dataQualityIssues.push({
+                        entity: data.friendly_name,
+                        entity_id: entityId,
+                        issue: `Value(s) ${outliers.map(o => o.toFixed(1)).join(', ')} are >3 std dev from mean (${avg.toFixed(1)} ± ${stdDev.toFixed(1)})`,
+                        severity: 'data_quality'
+                    });
+                }
+            }
+
+            stats = `min: ${min.toFixed(1)}, max: ${max.toFixed(1)}, avg: ${avg.toFixed(1)}${outlierFlag}`;
         } else {
             // For state values, show unique states
             const uniqueStates = [...new Set(values.map(v => v.value))];
@@ -332,6 +355,21 @@ ${failureLines.join('\n')}
 `;
     }
 
+    // Build data quality issues section
+    let dataQualitySection = '';
+    if (dataQualityIssues.length > 0) {
+        const dqLines = dataQualityIssues.map(dq =>
+            `- ${dq.entity} (${dq.entity_id}): ${dq.issue}`
+        );
+
+        dataQualitySection = `
+## Potential Data Quality Issues
+These values appear to be statistical outliers and may indicate sensor glitches:
+${dqLines.join('\n')}
+Use severity "data_quality" for these, not "warning" or "critical".
+`;
+    }
+
     // First-run specific instructions
     const firstRunInstructions = isFirstRun ? `
 ## IMPORTANT: First Run Scenario
@@ -356,7 +394,7 @@ ${profile.concerns ? `- Concerns: ${profile.concerns}` : ''}
 
 ## Entity Overview
 Total monitored: ${entities.length} entities across ${entityStats.length} categories
-${addonSection}${automationSection}${integrationSection}${batterySection}${logSection}${updateSection}${failedAutoSection}
+${addonSection}${automationSection}${integrationSection}${batterySection}${logSection}${updateSection}${failedAutoSection}${dataQualitySection}
 ## Data from ${periodLabel}
 ${entitySummaries.length > 0 ? entitySummaries.join('\\n') : 'No snapshot data available yet - this is expected for a new setup.'}
 

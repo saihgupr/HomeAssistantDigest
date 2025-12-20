@@ -42,7 +42,7 @@ Priority order based on impact to user experience.
 
 ---
 
-### 3. Distinguish Data Quality vs Real Issues (Medium Priority)
+### 3. Distinguish Data Quality vs Real Issues [DONE]
 
 **Problem**: "Frigate Inference Speed Anomaly" is a data reporting error, not an actual problem. The digest should know the difference.
 
