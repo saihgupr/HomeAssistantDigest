@@ -19,8 +19,14 @@
 
     <!-- Top Bar: Navigation -->
     <nav class="top-bar">
-        <div class="nav-links">
-            <a href="index.html" class="nav-link">← Back to Digest</a>
+        <div class="digest-type-slider">
+            <div class="layout-slider">
+                <a href="index.html" class="layout-btn"
+                    onclick="localStorage.setItem('ha-digest-view', 'daily')">Daily</a>
+                <a href="index.html" class="layout-btn"
+                    onclick="localStorage.setItem('ha-digest-view', 'weekly')">Weekly</a>
+                <button class="layout-btn active">Notes</button>
+            </div>
         </div>
     </nav>
 

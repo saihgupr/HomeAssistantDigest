@@ -158,6 +158,15 @@ ignore_entities:
   - binary_sensor.guest_room_motion  # Room is unused
 ```
 
+### User Notes
+Train the AI on your preferences directly from the UI. Click **Note** on any warning card to add context:
+
+- **"I don't update AdGuard Home"** → AI stops flagging update reminders
+- **"Toothpaste sensor is always on"** → Won't appear as an anomaly  
+- **"Garage door opens at 7am for work"** → Understood as normal behavior
+
+Notes are included in the AI prompt, helping it understand what's expected vs. what's actually a problem. Access all your notes from **Daily → Weekly → Notes** in the top navigation.
+
 ### Event Notes
 Help the AI understand sudden changes by logging events:
 

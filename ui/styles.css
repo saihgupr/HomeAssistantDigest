@@ -2565,6 +2565,11 @@ body {
     margin-top: 0;
 }
 
+/* Action buttons variant - left aligned */
+.modal-footer-actions {
+    justify-content: flex-start;
+}
+
 .modal-footer button,
 .modal-footer .btn-primary,
 .modal-footer .btn-secondary {

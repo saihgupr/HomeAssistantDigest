@@ -682,6 +682,7 @@ function showIssueDetails(itemId) {
     }
 
     // Build modal content
+    const escapedTitle = title.replace(/'/g, "\\'");
     const modalHtml = `
     <div class="modal-overlay active" onclick="closeModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
@@ -724,6 +725,16 @@ function showIssueDetails(itemId) {
                     <p>${detailedInfo.troubleshooting}</p>
                 </div>
                 ` : ''}
+            </div>
+            <div class="modal-footer modal-footer-actions">
+                <button class="action-btn" onclick="closeModal(); showFeedbackModal('${escapedTitle}');">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    Add Note
+                </button>
+                <button class="action-btn action-btn-muted" onclick="closeModal(); dismissWarning('${escapedTitle}');">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                    Ignore
+                </button>
             </div>
         </div>
     </div>
