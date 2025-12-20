@@ -56,7 +56,7 @@ Priority order based on impact to user experience.
 
 ---
 
-### 4. Stopped Add-ons Intelligence (Medium Priority)
+### 4. Stopped Add-ons Intelligence [DONE]
 
 **Problem**: Listing 5 stopped add-ons as "NEUTRAL" isn't helpful if they're intentionally stopped.
 

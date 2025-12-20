@@ -335,6 +335,7 @@ async function getAddonHealthReport() {
             slug: addon.slug,
             state: addon.state,
             version: addon.version,
+            boot: addon.boot, // 'auto' = should start automatically, 'manual' = intentionally controlled
             updateAvailable: addon.update_available || false
         };
 

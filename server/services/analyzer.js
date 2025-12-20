@@ -213,11 +213,16 @@ function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, ad
             .filter(a => a.state !== 'started')
             .map(a => a.name);
 
+        // Categorize stopped add-ons by intent
+        const unexpectedlyStoped = addonReport.addons.filter(a => a.state !== 'started' && a.boot === 'auto');
+        const intentionallyStopped = addonReport.addons.filter(a => a.state !== 'started' && a.boot === 'manual');
+
         const addonSummary = [
             `Total: ${addonReport.total} add-ons (${addonReport.running} running, ${addonReport.stopped} stopped)`,
-            stoppedAddons.length > 0 ? `Stopped add-ons: ${stoppedAddons.join(', ')}` : null,
+            unexpectedlyStoped.length > 0 ? `⚠️ Unexpectedly stopped (boot=auto): ${unexpectedlyStoped.map(a => a.name).join(', ')}` : null,
+            intentionallyStopped.length > 0 ? `Intentionally stopped (boot=manual): ${intentionallyStopped.map(a => a.name).join(', ')}` : null,
             addonReport.updateAvailable > 0 ? `Updates available: ${addonReport.updateAvailable}` : null,
-            ...addonReport.issues.map(i => `- ⚠️ ${i.addon}: ${i.issue}`)
+            ...addonReport.issues.filter(i => !i.issue.includes('auto-start')).map(i => `- ⚠️ ${i.addon}: ${i.issue}`) // Skip the auto-start issue since we show it above
         ].filter(Boolean);
 
         addonSection = `
@@ -415,6 +420,11 @@ DO NOT include observations that are just:
 - Generic facts about the system
 
 Aim for 2-4 HIGH-QUALITY observations, not many low-value ones.
+
+### Stopped Add-ons
+- Add-ons with boot=auto that are stopped are UNEXPECTED and should be flagged as attention items
+- Add-ons with boot=manual that are stopped are INTENTIONAL - do not treat as problems
+- Only mention intentionally stopped add-ons in positives if relevant (e.g., "X stopped add-ons are intentionally disabled")
 
 ### Tip - ONE SPECIFIC ACTION
 The tip MUST be:
