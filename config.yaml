@@ -14,7 +14,7 @@ hassio_api: true
 hassio_role: manager
 ingress: true
 ingress_port: 8099
-panel_icon: "mdi:newspaper-variant-outline"
+panel_icon: "mdi:check-circle"
 panel_title: "Digest"
 options:
   gemini_api_key: ""
