@@ -34,6 +34,12 @@ function getLatestDigest() {
     const row = result[0].values[0];
     const digest = {};
     columns.forEach((col, i) => digest[col] = row[i]);
+
+    // Ensure timestamp is treated as UTC
+    if (digest.timestamp && !digest.timestamp.endsWith('Z')) {
+        digest.timestamp += 'Z';
+    }
+
     return digest;
 }
 
@@ -56,6 +62,12 @@ function getLatestDigestByType(type) {
     const row = result[0].values[0];
     const digest = {};
     columns.forEach((col, i) => digest[col] = row[i]);
+
+    // Ensure timestamp is treated as UTC
+    if (digest.timestamp && !digest.timestamp.endsWith('Z')) {
+        digest.timestamp += 'Z';
+    }
+
     return digest;
 }
 
@@ -70,6 +82,12 @@ function getDigest(id) {
     if (stmt.step()) {
         const row = stmt.getAsObject();
         stmt.free();
+
+        // Ensure timestamp is treated as UTC
+        if (row.timestamp && !row.timestamp.endsWith('Z')) {
+            row.timestamp += 'Z';
+        }
+
         return row;
     }
     stmt.free();
@@ -104,6 +122,12 @@ function getDigests(limit = 10, offset = 0, type = null) {
     return result[0].values.map(row => {
         const digest = {};
         columns.forEach((col, i) => digest[col] = row[i]);
+
+        // Ensure timestamp is treated as UTC
+        if (digest.timestamp && !digest.timestamp.endsWith('Z')) {
+            digest.timestamp += 'Z';
+        }
+
         return digest;
     });
 }
@@ -140,7 +164,8 @@ function getDigestStats() {
         total_digests: total || 0,
         total_attention_items: totalAttention || 0,
         avg_attention_items: Math.round((avgAttention || 0) * 10) / 10,
-        last_digest_time: lastTime
+        // Ensure timestamp is treated as UTC
+        last_digest_time: lastTime && !lastTime.endsWith('Z') ? lastTime + 'Z' : lastTime
     };
 }
 
