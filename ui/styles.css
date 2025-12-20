@@ -2546,6 +2546,39 @@ body {
     margin-top: 1rem;
 }
 
+.modal-footer button,
+.modal-footer .btn-primary,
+.modal-footer .btn-secondary {
+    padding: 0.6rem 1.25rem;
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.modal-footer .btn-primary {
+    background: var(--accent);
+    color: white;
+}
+
+.modal-footer .btn-primary:hover {
+    background: var(--accent-hover, #4a7fe8);
+    transform: translateY(-1px);
+}
+
+.modal-footer .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+}
+
+.modal-footer .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
 /* Toast Notifications */
 .toast {
     position: fixed;
