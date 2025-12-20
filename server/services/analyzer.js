@@ -5,6 +5,7 @@ const { addDigest, getLatestDigest } = require('../db/digests');
 const { getAddonHealthReport, getAutomationHealthReport, getIntegrationHealthReport, getLogHealthReport, getUpdateReport, getFailedAutomations } = require('./homeassistant');
 const { getBatteryPredictions } = require('./predictions');
 const { getDismissedWarnings } = require('../db/dismissed');
+const { getNotesForPrompt } = require('../db/notes');
 
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
@@ -98,8 +99,14 @@ async function generateDigest(type = 'daily') {
     const dismissedWarnings = getDismissedWarnings();
     console.log(`[Digest] ${dismissedWarnings.length} dismissed warnings to filter`);
 
+    // Get user notes for personalization
+    const userNotes = getNotesForPrompt();
+    if (userNotes) {
+        console.log(`[Digest] Including user notes in prompt for personalization`);
+    }
+
     // Build the prompt
-    const prompt = buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport, automationReport, integrationReport, batteryPredictions, dismissedWarnings, logReport, updateReport, failedAutomations);
+    const prompt = buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport, automationReport, integrationReport, batteryPredictions, dismissedWarnings, logReport, updateReport, failedAutomations, userNotes);
 
     // Call Gemini API
     const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
@@ -159,7 +166,7 @@ async function generateDigest(type = 'daily') {
 /**
  * Build the analysis prompt for Gemini
  */
-function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport = null, automationReport = null, integrationReport = null, batteryPredictions = [], dismissedWarnings = [], logReport = null, updateReport = null, failedAutomations = null) {
+function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, addonReport = null, automationReport = null, integrationReport = null, batteryPredictions = [], dismissedWarnings = [], logReport = null, updateReport = null, failedAutomations = null, userNotes = null) {
     const periodLabel = type === 'weekly' ? 'past week' : 'past 24 hours';
 
     // Detect first-run scenario (no snapshot data yet)
@@ -485,6 +492,13 @@ ${dismissedWarnings.length > 0 ? `
 ## DISMISSED WARNINGS - DO NOT INCLUDE THESE:
 The user has dismissed the following warnings. DO NOT include any attention_items with these titles or similar topics:
 ${dismissedWarnings.map(d => `- "${d.title}"`).join('\n')}
+` : ''}
+${userNotes ? `
+## USER PREFERENCES - TAKE THESE INTO ACCOUNT:
+The user has added personal notes to help you understand their preferences. Consider these when analyzing:
+${userNotes}
+
+For example, if a user notes "I don't update AdGuard Home", do NOT flag AdGuard updates as attention items.
 ` : ''}
 ${isFirstRun ? 'Since this is the first run with no data yet, attention_items should be EMPTY and the tone should be welcoming.' : ''}
 Do NOT include markdown formatting in the JSON. Return ONLY raw JSON.`;

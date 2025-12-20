@@ -127,6 +127,20 @@ function runMigrations() {
     dismissed_at DATETIME DEFAULT CURRENT_TIMESTAMP
 )
             `
+        },
+        {
+            name: '006_create_user_notes',
+            sql: `
+                CREATE TABLE IF NOT EXISTS user_notes(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    warning_key TEXT NOT NULL,
+    title TEXT,
+    note TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+                CREATE INDEX IF NOT EXISTS idx_user_notes_warning_key 
+                ON user_notes(warning_key);
+            `
         }
     ];
 

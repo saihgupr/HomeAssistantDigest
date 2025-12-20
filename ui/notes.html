@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="neptune" data-layout="monet">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Notes - Home Assistant Digest</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+Pro:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Stars background for space themes -->
+    <div class="stars"></div>
+
+    <!-- Top Bar: Navigation -->
+    <nav class="top-bar">
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">← Back to Digest</a>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <header class="header">
+            <div class="logo">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+                <h1>My Notes</h1>
+            </div>
+            <p class="tagline">Personal preferences to help the AI understand your home better</p>
+        </header>
+
+        <main class="main">
+            <!-- Notes List -->
+            <section class="card notes-card">
+                <div class="notes-header">
+                    <h2>Your Notes</h2>
+                    <button class="btn btn-primary btn-sm" id="add-note-btn">
+                        + Add Note
+                    </button>
+                </div>
+
+                <div class="notes-list" id="notes-list">
+                    <div class="empty-state" id="empty-state">
+                        <h3>No notes yet</h3>
+                        <p>Add notes to help the AI learn your preferences.</p>
+                        <p class="empty-hint">For example: "I don't update AdGuard Home" or "This sensor is
+                            intentionally always on"</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- How It Works -->
+            <section class="card info-card">
+                <h2>How Notes Work</h2>
+                <div class="info-content">
+                    <p>Notes help personalize your digest by telling the AI about your preferences:</p>
+                    <ul>
+                        <li><strong>Ignore updates:</strong> "I don't update AdGuard Home" → AI won't flag this add-on
+                            for updates</li>
+                        <li><strong>Expected behavior:</strong> "Toothpaste sensor is always on" → Won't appear as an
+                            anomaly</li>
+                        <li><strong>Custom context:</strong> "Garage door opens at 7am for work" → Understood as normal
+                            pattern</li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>Home Assistant Digest v0.1.0</p>
+        </footer>
+    </div>
+
+    <script src="notes.js"></script>
+</body>
+
+</html>

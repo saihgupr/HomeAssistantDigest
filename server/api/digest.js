@@ -181,4 +181,80 @@ router.post('/restore', (req, res) => {
     }
 });
 
+// ============================================
+// User Notes Routes
+// ============================================
+
+const { addNote, getNotes, getNote, updateNote, deleteNote } = require('../db/notes');
+
+/**
+ * POST /api/digest/note
+ * Add a note for a warning
+ */
+router.post('/note', (req, res) => {
+    try {
+        const { title, note } = req.body;
+
+        if (!title || !note) {
+            return res.status(400).json({ error: 'title and note are required' });
+        }
+
+        const result = addNote(title, note);
+        res.json({ success: true, ...result });
+    } catch (error) {
+        console.error('Add note error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+/**
+ * GET /api/digest/notes
+ * Get all user notes
+ */
+router.get('/notes', (req, res) => {
+    try {
+        const notes = getNotes();
+        res.json({ notes });
+    } catch (error) {
+        console.error('Get notes error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+/**
+ * PUT /api/digest/note/:id
+ * Update a note
+ */
+router.put('/note/:id', (req, res) => {
+    try {
+        const { note } = req.body;
+        const id = parseInt(req.params.id);
+
+        if (!note) {
+            return res.status(400).json({ error: 'note is required' });
+        }
+
+        updateNote(id, note);
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Update note error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+/**
+ * DELETE /api/digest/note/:id
+ * Delete a note
+ */
+router.delete('/note/:id', (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+        deleteNote(id);
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Delete note error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports = router;

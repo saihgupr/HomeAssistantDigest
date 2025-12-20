@@ -572,14 +572,18 @@ function createDigestCard({ type, icon, title, desc, footer, detailedInfo, itemI
     const iconSvg = getIconSvg(icon);
 
     // Add dismiss button for attention/warning cards
-    // Add dismiss button for attention/warning cards
     const dismissBtn = (type === 'attention')
         ? `<button class="dismiss-btn" onclick="dismissWarning('${title.replace(/'/g, "\\'")}')">${getIconSvg('dismiss')}Ignore</button>`
         : '';
 
-    // Add info button for attention cards with detailed info
+    // Add note button for attention cards
+    const noteBtn = (type === 'attention')
+        ? `<button class="note-btn" onclick="showNoteModal('${title.replace(/'/g, "\\'")}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Note</button>`
+        : '';
+
+    // Add info button for attention cards with detailed info (outline icon)
     const infoBtn = (type === 'attention' && detailedInfo)
-        ? `<button class="info-btn" onclick="showIssueDetails('${itemId}')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>Info</button>`
+        ? `<button class="info-btn" onclick="showIssueDetails('${itemId}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Info</button>`
         : '';
 
     // Store detailed info in a data attribute for the modal
@@ -593,6 +597,7 @@ function createDigestCard({ type, icon, title, desc, footer, detailedInfo, itemI
             <div class="digest-card-icon">${iconSvg}</div>
             <div class="digest-card-title">${title}</div>
             ${infoBtn}
+            ${noteBtn}
             ${dismissBtn}
         </div>
         <div class="digest-card-desc">${desc}</div>
@@ -801,3 +806,118 @@ function renderDigestListItems(digestsToRender, allDigests) {
         `;
     }).join('');
 }
+
+// ============================================
+// User Notes Modal
+// ============================================
+
+/**
+ * Show modal for adding a note to a warning
+ */
+function showNoteModal(title) {
+    const modalHtml = `
+    <div class="modal-overlay active" onclick="closeNoteModal(event)">
+        <div class="modal-content note-modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Add Note</h3>
+                <button class="modal-close" onclick="closeNoteModal()">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h4>For: ${title}</h4>
+                    <p class="note-hint">Add a personal note to help the AI understand your preferences. For example: "I don't update this", "This is expected behavior", etc.</p>
+                </div>
+                <div class="modal-section">
+                    <textarea id="note-input" class="note-textarea" placeholder="Type your note here..." rows="4"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeNoteModal()">Cancel</button>
+                <button class="btn-primary" onclick="saveNote('${title.replace(/'/g, "\\'")}')">Save Note</button>
+            </div>
+        </div>
+    </div>
+    `;
+
+    // Remove existing modal if any
+    const existingModal = document.querySelector('.modal-overlay');
+    if (existingModal) existingModal.remove();
+
+    // Add modal to body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Focus the textarea
+    setTimeout(() => {
+        document.getElementById('note-input')?.focus();
+    }, 100);
+}
+
+/**
+ * Close the note modal
+ */
+function closeNoteModal(event) {
+    if (event && event.target !== event.currentTarget) return;
+    const modal = document.querySelector('.modal-overlay');
+    if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => modal.remove(), 300);
+    }
+}
+
+/**
+ * Save a note to the backend
+ */
+async function saveNote(title) {
+    const noteInput = document.getElementById('note-input');
+    const note = noteInput?.value?.trim();
+
+    if (!note) {
+        noteInput?.classList.add('error');
+        return;
+    }
+
+    try {
+        const response = await fetch('api/digest/note', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, note })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            closeNoteModal();
+            // Show a brief success indicator
+            showToast('Note saved successfully!');
+        } else {
+            throw new Error(data.error || 'Failed to save note');
+        }
+    } catch (error) {
+        console.error('Failed to save note:', error);
+        showToast('Failed to save note', 'error');
+    }
+}
+
+/**
+ * Show a toast notification
+ */
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// Make note functions available globally
+window.showNoteModal = showNoteModal;
+window.closeNoteModal = closeNoteModal;
+window.saveNote = saveNote;
+
