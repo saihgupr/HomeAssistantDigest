@@ -1,8 +1,8 @@
-// Feedback Management Page JavaScript
+// Notes Management Page JavaScript
 
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
-    loadFeedback();
+    loadNotes();
     setupEventListeners();
 });
 
@@ -20,28 +20,28 @@ function initTheme() {
 function setupEventListeners() {
     const addBtn = document.getElementById('add-feedback-btn');
     if (addBtn) {
-        addBtn.addEventListener('click', showAddFeedbackModal);
+        addBtn.addEventListener('click', showAddNoteModal);
     }
 }
 
 /**
- * Load all feedback from backend
+ * Load all notes from backend
  */
-async function loadFeedback() {
+async function loadNotes() {
     try {
         const response = await fetch('api/digest/notes');
         const data = await response.json();
 
-        renderFeedback(data.notes || []);
+        renderNotes(data.notes || []);
     } catch (error) {
-        console.error('Failed to load feedback:', error);
+        console.error('Failed to load notes:', error);
     }
 }
 
 /**
- * Render feedback list
+ * Render notes list
  */
-function renderFeedback(items) {
+function renderNotes(items) {
     const list = document.getElementById('feedback-list');
     const emptyState = document.getElementById('empty-state');
 
@@ -61,13 +61,13 @@ function renderFeedback(items) {
                 <div class="feedback-date">Added ${formatDate(item.created_at)}</div>
             </div>
             <div class="feedback-actions">
-                <button class="btn-icon" onclick="editFeedback(${item.id})" title="Edit">
+                <button class="btn-icon" onclick="editNote(${item.id})" title="Edit">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                     </svg>
                 </button>
-                <button class="btn-icon btn-danger" onclick="deleteFeedbackConfirm(${item.id})" title="Delete">
+                <button class="btn-icon btn-danger" onclick="deleteNoteConfirm(${item.id})" title="Delete">
                     <svg viewBox="0 0 24 24" fill="currentColor">
                         <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
                     </svg>
@@ -78,14 +78,14 @@ function renderFeedback(items) {
 }
 
 /**
- * Show modal for adding new feedback
+ * Show modal for adding new note
  */
-function showAddFeedbackModal() {
+function showAddNoteModal() {
     const modalHtml = `
     <div class="modal-overlay active" onclick="closeModal(event)">
         <div class="modal-content feedback-modal" onclick="event.stopPropagation()">
             <div class="modal-header">
-                <h3>Add Feedback</h3>
+                <h3>Add Note</h3>
                 <button class="modal-close" onclick="closeModal()">
                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                 </button>
@@ -96,13 +96,13 @@ function showAddFeedbackModal() {
                     <input type="text" id="feedback-title" class="feedback-input" placeholder="e.g., AdGuard Home Updates">
                 </div>
                 <div class="modal-section">
-                    <label for="feedback-input">Your Feedback</label>
-                    <textarea id="feedback-input" class="feedback-textarea" placeholder="Type your preference..." rows="4"></textarea>
+                    <label for="feedback-input">Your Note</label>
+                    <textarea id="feedback-input" class="feedback-textarea" placeholder="Type your note..." rows="4"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
                 <button class="btn-secondary" onclick="closeModal()">Cancel</button>
-                <button class="btn-primary" onclick="saveNewFeedback()">Save</button>
+                <button class="btn-primary" onclick="saveNewNote()">Save</button>
             </div>
         </div>
     </div>
@@ -113,18 +113,18 @@ function showAddFeedbackModal() {
 }
 
 /**
- * Save new feedback
+ * Save new note
  */
-async function saveNewFeedback() {
+async function saveNewNote() {
     const titleInput = document.getElementById('feedback-title');
-    const feedbackInput = document.getElementById('feedback-input');
+    const noteInput = document.getElementById('feedback-input');
 
     const title = titleInput?.value?.trim();
-    const feedback = feedbackInput?.value?.trim();
+    const note = noteInput?.value?.trim();
 
-    if (!title || !feedback) {
+    if (!title || !note) {
         if (!title) titleInput?.classList.add('error');
-        if (!feedback) feedbackInput?.classList.add('error');
+        if (!note) noteInput?.classList.add('error');
         return;
     }
 
@@ -132,28 +132,28 @@ async function saveNewFeedback() {
         const response = await fetch('api/digest/note', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, note: feedback })
+            body: JSON.stringify({ title, note })
         });
 
         const data = await response.json();
 
         if (data.success) {
             closeModal();
-            await loadFeedback();
-            showToast('Feedback saved!');
+            await loadNotes();
+            showToast('Note saved!');
         } else {
             throw new Error(data.error);
         }
     } catch (error) {
-        console.error('Failed to save feedback:', error);
-        showToast('Failed to save feedback', 'error');
+        console.error('Failed to save note:', error);
+        showToast('Failed to save note', 'error');
     }
 }
 
 /**
- * Edit existing feedback
+ * Edit existing note
  */
-async function editFeedback(id) {
+async function editNote(id) {
     try {
         const response = await fetch('api/digest/notes');
         const data = await response.json();
@@ -165,7 +165,7 @@ async function editFeedback(id) {
         <div class="modal-overlay active" onclick="closeModal(event)">
             <div class="modal-content feedback-modal" onclick="event.stopPropagation()">
                 <div class="modal-header">
-                    <h3>Edit Feedback</h3>
+                    <h3>Edit Note</h3>
                     <button class="modal-close" onclick="closeModal()">
                         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                     </button>
@@ -176,13 +176,13 @@ async function editFeedback(id) {
                         <div class="feedback-title-display">${escapeHtml(item.title)}</div>
                     </div>
                     <div class="modal-section">
-                        <label for="feedback-input">Your Feedback</label>
+                        <label for="feedback-input">Your Note</label>
                         <textarea id="feedback-input" class="feedback-textarea" rows="4">${escapeHtml(item.note)}</textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn-secondary" onclick="closeModal()">Cancel</button>
-                    <button class="btn-primary" onclick="updateFeedback(${id})">Update</button>
+                    <button class="btn-primary" onclick="updateNote(${id})">Update</button>
                 </div>
             </div>
         </div>
@@ -191,19 +191,19 @@ async function editFeedback(id) {
         document.body.insertAdjacentHTML('beforeend', modalHtml);
         setTimeout(() => document.getElementById('feedback-input')?.focus(), 100);
     } catch (error) {
-        console.error('Failed to load feedback:', error);
+        console.error('Failed to load note:', error);
     }
 }
 
 /**
- * Update existing feedback
+ * Update existing note
  */
-async function updateFeedback(id) {
-    const feedbackInput = document.getElementById('feedback-input');
-    const feedback = feedbackInput?.value?.trim();
+async function updateNote(id) {
+    const noteInput = document.getElementById('feedback-input');
+    const note = noteInput?.value?.trim();
 
-    if (!feedback) {
-        feedbackInput?.classList.add('error');
+    if (!note) {
+        noteInput?.classList.add('error');
         return;
     }
 
@@ -211,20 +211,20 @@ async function updateFeedback(id) {
         const response = await fetch(`api/digest/note/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ note: feedback })
+            body: JSON.stringify({ note })
         });
 
         const data = await response.json();
 
         if (data.success) {
             closeModal();
-            await loadFeedback();
-            showToast('Feedback updated!');
+            await loadNotes();
+            showToast('Note updated!');
         } else {
             throw new Error(data.error);
         }
     } catch (error) {
-        console.error('Failed to update feedback:', error);
+        console.error('Failed to update note:', error);
         showToast('Failed to update', 'error');
     }
 }
@@ -232,22 +232,22 @@ async function updateFeedback(id) {
 /**
  * Show delete confirmation
  */
-function deleteFeedbackConfirm(id) {
+function deleteNoteConfirm(id) {
     const modalHtml = `
     <div class="modal-overlay active" onclick="closeModal(event)">
         <div class="modal-content confirm-modal" onclick="event.stopPropagation()">
             <div class="modal-header">
-                <h3>Delete Feedback?</h3>
+                <h3>Delete Note?</h3>
                 <button class="modal-close" onclick="closeModal()">
                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                 </button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete this feedback?</p>
+                <p>Are you sure you want to delete this note?</p>
             </div>
             <div class="modal-footer">
                 <button class="btn-secondary" onclick="closeModal()">Cancel</button>
-                <button class="btn-danger" onclick="deleteFeedback(${id})">Delete</button>
+                <button class="btn-danger" onclick="deleteNote(${id})">Delete</button>
             </div>
         </div>
     </div>
@@ -257,9 +257,9 @@ function deleteFeedbackConfirm(id) {
 }
 
 /**
- * Delete feedback
+ * Delete note
  */
-async function deleteFeedback(id) {
+async function deleteNote(id) {
     try {
         const response = await fetch(`api/digest/note/${id}`, {
             method: 'DELETE'
@@ -269,13 +269,13 @@ async function deleteFeedback(id) {
 
         if (data.success) {
             closeModal();
-            await loadFeedback();
-            showToast('Feedback deleted');
+            await loadNotes();
+            showToast('Note deleted');
         } else {
             throw new Error(data.error);
         }
     } catch (error) {
-        console.error('Failed to delete feedback:', error);
+        console.error('Failed to delete note:', error);
         showToast('Failed to delete', 'error');
     }
 }
@@ -330,11 +330,11 @@ function escapeHtml(text) {
 }
 
 // Make functions available globally
-window.showAddFeedbackModal = showAddFeedbackModal;
-window.editFeedback = editFeedback;
-window.updateFeedback = updateFeedback;
-window.deleteFeedbackConfirm = deleteFeedbackConfirm;
-window.deleteFeedback = deleteFeedback;
+window.showAddNoteModal = showAddNoteModal;
+window.editNote = editNote;
+window.updateNote = updateNote;
+window.deleteNoteConfirm = deleteNoteConfirm;
+window.deleteNote = deleteNote;
 window.closeModal = closeModal;
 
 // Close modal on Escape key

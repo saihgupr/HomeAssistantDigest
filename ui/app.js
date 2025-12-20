@@ -576,9 +576,9 @@ function createDigestCard({ type, icon, title, desc, footer, detailedInfo, itemI
         ? `<button class="dismiss-btn" onclick="dismissWarning('${title.replace(/'/g, "\\'")}')">${getIconSvg('dismiss')}Ignore</button>`
         : '';
 
-    // Add feedback button for attention cards
+    // Add note button for attention cards
     const feedbackBtn = (type === 'attention')
-        ? `<button class="feedback-btn" onclick="showFeedbackModal('${title.replace(/'/g, "\\'")}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Feedback</button>`
+        ? `<button class="feedback-btn" onclick="showFeedbackModal('${title.replace(/'/g, "\\'")}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Note</button>`
         : '';
 
     // Add info button for attention cards with detailed info (outline icon)
@@ -812,14 +812,14 @@ function renderDigestListItems(digestsToRender, allDigests) {
 // ============================================
 
 /**
- * Show modal for adding feedback to a warning
+ * Show modal for adding a note to a warning
  */
 function showFeedbackModal(title) {
     const modalHtml = `
     <div class="modal-overlay active" onclick="closeFeedbackModal(event)">
         <div class="modal-content feedback-modal" onclick="event.stopPropagation()">
             <div class="modal-header">
-                <h3>Add Feedback</h3>
+                <h3>Add Note</h3>
                 <button class="modal-close" onclick="closeFeedbackModal()">
                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                 </button>
@@ -827,10 +827,10 @@ function showFeedbackModal(title) {
             <div class="modal-body">
                 <div class="modal-section">
                     <h4>For: ${title}</h4>
-                    <p class="feedback-hint">Tell the AI about your preferences. For example: "I don't update this add-on", "This is expected behavior", etc.</p>
+                    <p class="feedback-hint">Add a note to help the AI understand your preferences. For example: "I don't update this", "This is expected", etc.</p>
                 </div>
                 <div class="modal-section">
-                    <textarea id="feedback-input" class="feedback-textarea" placeholder="Type your feedback here..." rows="4"></textarea>
+                    <textarea id="feedback-input" class="feedback-textarea" placeholder="Type your note here..." rows="4"></textarea>
                 </div>
             </div>
             <div class="modal-footer">

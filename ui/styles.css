@@ -356,6 +356,7 @@ body {
     transition: all 0.2s ease;
     border-radius: 4px;
     white-space: nowrap;
+    text-decoration: none;
 }
 
 .layout-btn:hover {
