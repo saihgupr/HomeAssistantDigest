@@ -87,6 +87,22 @@ router.get('/list', (req, res) => {
 });
 
 /**
+ * GET /api/digest/notes
+ * Get all user notes - MUST be before /:id to avoid route conflict
+ */
+const { addNote, getNotes, getNote, updateNote, deleteNote } = require('../db/notes');
+
+router.get('/notes', (req, res) => {
+    try {
+        const notes = getNotes();
+        res.json({ notes });
+    } catch (error) {
+        console.error('Get notes error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+/**
  * GET /api/digest/:id
  * Get a specific digest by ID
  */
@@ -182,10 +198,8 @@ router.post('/restore', (req, res) => {
 });
 
 // ============================================
-// User Notes Routes
+// User Notes Routes (POST, PUT, DELETE only - GET /notes is above /:id)
 // ============================================
-
-const { addNote, getNotes, getNote, updateNote, deleteNote } = require('../db/notes');
 
 /**
  * POST /api/digest/note
@@ -203,20 +217,6 @@ router.post('/note', (req, res) => {
         res.json({ success: true, ...result });
     } catch (error) {
         console.error('Add note error:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-/**
- * GET /api/digest/notes
- * Get all user notes
- */
-router.get('/notes', (req, res) => {
-    try {
-        const notes = getNotes();
-        res.json({ notes });
-    } catch (error) {
-        console.error('Get notes error:', error);
         res.status(500).json({ error: error.message });
     }
 });

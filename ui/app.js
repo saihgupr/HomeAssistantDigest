@@ -797,7 +797,8 @@ function renderDigestListItems(digestsToRender, allDigests) {
 
     return digestsToRender.map(digest => {
         const isCurrent = digest.id === latestId;
-        const dateStr = new Date(digest.timestamp).toLocaleDateString();
+        const d = new Date(digest.timestamp);
+        const dateStr = d.toLocaleDateString('en-US') + ' ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 
         // Label logic: "Current" (bold, no date) or Date
         const label = isCurrent ? `<strong>Current</strong>` : dateStr;
