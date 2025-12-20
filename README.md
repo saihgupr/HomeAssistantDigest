@@ -162,7 +162,7 @@ ignore_entities:
 Train the AI on your preferences directly from the UI. Click **Note** on any warning card to add context:
 
 - **"I don't update AdGuard Home"** → AI stops flagging update reminders
-- **"Toothpaste sensor is always on"** → Won't appear as an anomaly  
+- **"Laundry running late is normal on weekends"** → Won't flag as an anomaly  
 - **"Garage door opens at 7am for work"** → Understood as normal behavior
 
 Notes are included in the AI prompt, helping it understand what's expected vs. what's actually a problem. Access all your notes from **Daily → Weekly → Notes** in the top navigation.

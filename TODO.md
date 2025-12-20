@@ -16,7 +16,7 @@ Priority order based on impact to user experience.
 
 ### 1. Reduce Observation Noise (High Priority)
 
-**Problem**: Neutral observations like "Toothpaste Sensor consistently on" and "Unused Speaker Entities" create alert fatigue. They're observations, not insights.
+**Problem**: Neutral observations like "Guest room motion sensor rarely triggers" and "Unused Speaker Entities" create alert fatigue. They're observations, not insights.
 
 **Solution**:
 - [ ] Add "change detection" - only show observations if state differs from previous digest
