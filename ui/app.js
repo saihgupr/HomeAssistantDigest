@@ -576,9 +576,9 @@ function createDigestCard({ type, icon, title, desc, footer, detailedInfo, itemI
         ? `<button class="dismiss-btn" onclick="dismissWarning('${title.replace(/'/g, "\\'")}')">${getIconSvg('dismiss')}Ignore</button>`
         : '';
 
-    // Add note button for attention cards
-    const noteBtn = (type === 'attention')
-        ? `<button class="note-btn" onclick="showNoteModal('${title.replace(/'/g, "\\'")}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Note</button>`
+    // Add feedback button for attention cards
+    const feedbackBtn = (type === 'attention')
+        ? `<button class="feedback-btn" onclick="showFeedbackModal('${title.replace(/'/g, "\\'")}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Feedback</button>`
         : '';
 
     // Add info button for attention cards with detailed info (outline icon)
@@ -597,7 +597,7 @@ function createDigestCard({ type, icon, title, desc, footer, detailedInfo, itemI
             <div class="digest-card-icon">${iconSvg}</div>
             <div class="digest-card-title">${title}</div>
             ${infoBtn}
-            ${noteBtn}
+            ${feedbackBtn}
             ${dismissBtn}
         </div>
         <div class="digest-card-desc">${desc}</div>
@@ -812,30 +812,30 @@ function renderDigestListItems(digestsToRender, allDigests) {
 // ============================================
 
 /**
- * Show modal for adding a note to a warning
+ * Show modal for adding feedback to a warning
  */
-function showNoteModal(title) {
+function showFeedbackModal(title) {
     const modalHtml = `
-    <div class="modal-overlay active" onclick="closeNoteModal(event)">
-        <div class="modal-content note-modal" onclick="event.stopPropagation()">
+    <div class="modal-overlay active" onclick="closeFeedbackModal(event)">
+        <div class="modal-content feedback-modal" onclick="event.stopPropagation()">
             <div class="modal-header">
-                <h3>Add Note</h3>
-                <button class="modal-close" onclick="closeNoteModal()">
+                <h3>Add Feedback</h3>
+                <button class="modal-close" onclick="closeFeedbackModal()">
                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="modal-section">
                     <h4>For: ${title}</h4>
-                    <p class="note-hint">Add a personal note to help the AI understand your preferences. For example: "I don't update this", "This is expected behavior", etc.</p>
+                    <p class="feedback-hint">Tell the AI about your preferences. For example: "I don't update this add-on", "This is expected behavior", etc.</p>
                 </div>
                 <div class="modal-section">
-                    <textarea id="note-input" class="note-textarea" placeholder="Type your note here..." rows="4"></textarea>
+                    <textarea id="feedback-input" class="feedback-textarea" placeholder="Type your feedback here..." rows="4"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn-secondary" onclick="closeNoteModal()">Cancel</button>
-                <button class="btn-primary" onclick="saveNote('${title.replace(/'/g, "\\'")}')">Save Note</button>
+                <button class="btn-secondary" onclick="closeFeedbackModal()">Cancel</button>
+                <button class="btn-primary" onclick="saveFeedback('${title.replace(/'/g, "\\'")}')">Save</button>
             </div>
         </div>
     </div>
@@ -850,14 +850,14 @@ function showNoteModal(title) {
 
     // Focus the textarea
     setTimeout(() => {
-        document.getElementById('note-input')?.focus();
+        document.getElementById('feedback-input')?.focus();
     }, 100);
 }
 
 /**
- * Close the note modal
+ * Close the feedback modal
  */
-function closeNoteModal(event) {
+function closeFeedbackModal(event) {
     if (event && event.target !== event.currentTarget) return;
     const modal = document.querySelector('.modal-overlay');
     if (modal) {
@@ -867,14 +867,14 @@ function closeNoteModal(event) {
 }
 
 /**
- * Save a note to the backend
+ * Save feedback to the backend
  */
-async function saveNote(title) {
-    const noteInput = document.getElementById('note-input');
-    const note = noteInput?.value?.trim();
+async function saveFeedback(title) {
+    const feedbackInput = document.getElementById('feedback-input');
+    const feedback = feedbackInput?.value?.trim();
 
-    if (!note) {
-        noteInput?.classList.add('error');
+    if (!feedback) {
+        feedbackInput?.classList.add('error');
         return;
     }
 
@@ -882,21 +882,20 @@ async function saveNote(title) {
         const response = await fetch('api/digest/note', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, note })
+            body: JSON.stringify({ title, note: feedback })
         });
 
         const data = await response.json();
 
         if (data.success) {
-            closeNoteModal();
-            // Show a brief success indicator
-            showToast('Note saved successfully!');
+            closeFeedbackModal();
+            showToast('Feedback saved!');
         } else {
-            throw new Error(data.error || 'Failed to save note');
+            throw new Error(data.error || 'Failed to save feedback');
         }
     } catch (error) {
-        console.error('Failed to save note:', error);
-        showToast('Failed to save note', 'error');
+        console.error('Failed to save feedback:', error);
+        showToast('Failed to save feedback', 'error');
     }
 }
 
@@ -916,8 +915,8 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
-// Make note functions available globally
-window.showNoteModal = showNoteModal;
-window.closeNoteModal = closeNoteModal;
-window.saveNote = saveNote;
+// Make feedback functions available globally
+window.showFeedbackModal = showFeedbackModal;
+window.closeFeedbackModal = closeFeedbackModal;
+window.saveFeedback = saveFeedback;
 
