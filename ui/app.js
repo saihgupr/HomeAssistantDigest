@@ -549,11 +549,10 @@ function renderDigestCards(digestData) {
             // Legacy: tip is just a string
             tipContent = digestData.tip;
         } else {
-            // New format: tip is an object with title, action, reason
+            // New format: tip is an object - just show title and action (reason is redundant)
             tipContent = `
                 <strong>${digestData.tip.title || 'Tip'}</strong><br>
-                ${digestData.tip.action || ''}<br>
-                <em style="opacity: 0.8; font-size: 0.9em;">${digestData.tip.reason || ''}</em>
+                ${digestData.tip.action || ''}
             `;
         }
         html += createDigestCard({

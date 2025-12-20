@@ -438,9 +438,8 @@ Analyze the data and return a JSON object with the following structure:
     }
   ],
   "tip": {
-    "title": "One specific, actionable tip",
-    "action": "Exact action to take (e.g., 'Remove sensor.unused_device' or 'Create automation when motion detected after 11pm')",
-    "reason": "Why this would benefit the user"
+    "title": "Short tip headline (max 10 words)",
+    "action": "One concise sentence explaining what to do and why"
   }
 }
 
@@ -471,22 +470,21 @@ Aim for 2-4 HIGH-QUALITY observations, not many low-value ones.
 - Add-ons with boot=manual that are stopped are INTENTIONAL - do not treat as problems
 - Only mention intentionally stopped add-ons in positives if relevant (e.g., "X stopped add-ons are intentionally disabled")
 
-### Tip - ONE SPECIFIC ACTION
+### Tip - ONE CONCISE ACTION
 The tip MUST be:
-- **Singular**: One tip only, not a list
-- **Specific**: Reference exact entity IDs or specific actions
+- **Brief**: Title max 10 words, action max 2 sentences
+- **Singular**: One tip only, not a list of entities
+- **Specific**: Reference ONE exact entity or action, not groups
 - **Actionable**: User can do it today
-- **Derived from data**: Based on what you analyzed, not generic advice
 
 Good examples:
-- "Remove 'sensor.old_thermostat' - it hasn't reported data in 7 days"
-- "Create an automation to turn off 'light.garage' after 30 minutes - it was left on for 6 hours yesterday"
-- "Battery in 'sensor.front_door' is at 15% - replace within the next week"
+- Title: \"Replace front door battery\", Action: \"At 15%, it will die within a week.\"
+- Title: \"Remove stale garage sensor\", Action: \"sensor.old_thermostat hasn't reported in 7 days.\"
 
 Bad examples:
-- "Consider removing unused entities" (too vague)
-- "Review your automations" (not specific)
-- "sensor.a, sensor.b, sensor.c are unused" (that's a list, not a tip)
+- Listing multiple entities: \"Remove sensor.a, sensor.b, sensor.c...\" (pick ONE)
+- Generic advice: \"Consider removing unused entities\" (too vague)
+- Long explanations with repeated information
 
 ${dismissedWarnings.length > 0 ? `
 ## DISMISSED WARNINGS - DO NOT INCLUDE THESE:
