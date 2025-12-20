@@ -571,20 +571,17 @@ function renderDigestCards(digestData) {
 function createDigestCard({ type, icon, title, desc, footer, detailedInfo, itemId, className = '' }) {
     const iconSvg = getIconSvg(icon);
 
-    // Add dismiss button for attention/warning cards
-    const dismissBtn = (type === 'attention')
-        ? `<button class="dismiss-btn" onclick="dismissWarning('${title.replace(/'/g, "\\'")}')">${getIconSvg('dismiss')}Ignore</button>`
-        : '';
+    // Build action buttons for attention cards
+    let actionsHtml = '';
+    if (type === 'attention') {
+        const infoBtn = detailedInfo
+            ? `<button class="action-btn" onclick="showIssueDetails('${itemId}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Info</button>`
+            : '';
+        const noteBtn = `<button class="action-btn" onclick="showFeedbackModal('${title.replace(/'/g, "\\'")}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Note</button>`;
+        const ignoreBtn = `<button class="action-btn action-btn-muted" onclick="dismissWarning('${title.replace(/'/g, "\\'")}')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>Ignore</button>`;
 
-    // Add note button for attention cards
-    const feedbackBtn = (type === 'attention')
-        ? `<button class="feedback-btn" onclick="showFeedbackModal('${title.replace(/'/g, "\\'")}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Note</button>`
-        : '';
-
-    // Add info button for attention cards with detailed info (outline icon)
-    const infoBtn = (type === 'attention' && detailedInfo)
-        ? `<button class="info-btn" onclick="showIssueDetails('${itemId}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Info</button>`
-        : '';
+        actionsHtml = `<div class="card-actions">${infoBtn}${noteBtn}${ignoreBtn}</div>`;
+    }
 
     // Store detailed info in a data attribute for the modal
     const dataAttr = (detailedInfo && itemId)
@@ -596,11 +593,9 @@ function createDigestCard({ type, icon, title, desc, footer, detailedInfo, itemI
         <div class="digest-card-header">
             <div class="digest-card-icon">${iconSvg}</div>
             <div class="digest-card-title">${title}</div>
-            ${infoBtn}
-            ${feedbackBtn}
-            ${dismissBtn}
         </div>
         <div class="digest-card-desc">${desc}</div>
+        ${actionsHtml}
         ${footer ? `<div class="digest-card-footer">${footer}</div>` : ''}
     </div>
     `;

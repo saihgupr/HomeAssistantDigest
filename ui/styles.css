@@ -957,10 +957,9 @@ body {
 
 .digest-card-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 0.5rem;
     margin-bottom: 0.25rem;
-    flex-wrap: wrap;
 }
 
 .digest-card-icon {
@@ -969,51 +968,70 @@ body {
 
 .digest-card-title {
     flex: 1;
-    min-width: 150px;
 }
 
-/* Button group container */
-.digest-card-header .info-btn,
-.digest-card-header .feedback-btn,
-.digest-card-header .dismiss-btn {
-    flex-shrink: 0;
+/* Card Actions Bar - appears below description on hover */
+.card-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.2s ease;
 }
 
-.digest-card-header .dismiss-btn {
-    margin-left: auto;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.7rem;
-    background: rgba(100, 150, 255, 0.15);
-    /* Matched to info-btn */
-    border: 1px solid rgba(100, 150, 255, 0.3);
+.digest-card-item:hover .card-actions {
+    opacity: 1;
+    max-height: 50px;
+}
+
+/* Action Button - unified style */
+.action-btn {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: rgba(100, 150, 255, 0.12);
+    border: 1px solid rgba(100, 150, 255, 0.25);
     border-radius: 4px;
     color: var(--accent);
     cursor: pointer;
     transition: all 0.2s ease;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
-    opacity: 0;
+    gap: 0.3rem;
+    white-space: nowrap;
 }
 
-.digest-card-header:hover .dismiss-btn {
-    opacity: 1;
+.action-btn:hover {
+    background: rgba(100, 150, 255, 0.22);
+    border-color: rgba(100, 150, 255, 0.4);
+    transform: translateY(-1px);
 }
 
-.dismiss-btn:hover {
-    background: rgba(100, 150, 255, 0.25);
-    color: var(--text-primary);
-}
-
-.dismiss-btn svg {
+.action-btn svg {
     width: 12px;
     height: 12px;
 }
 
-.digest-card-icon {
+/* Muted action button (for Ignore) */
+.action-btn-muted {
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.15);
+    color: var(--text-muted);
+}
+
+.action-btn-muted:hover {
+    background: rgba(255, 100, 100, 0.1);
+    border-color: rgba(255, 100, 100, 0.3);
+    color: #ff6b6b;
+}
+
+.digest-card-icon svg {
     width: 24px;
     height: 24px;
-    flex-shrink: 0;
 }
 
 .digest-card-title {
