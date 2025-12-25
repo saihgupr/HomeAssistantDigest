@@ -19,9 +19,9 @@ Priority order based on impact to user experience.
 **Problem**: Neutral observations like "Guest room motion sensor rarely triggers" and "Unused Speaker Entities" create alert fatigue. They're observations, not insights.
 
 **Solution**:
-- [ ] Add "change detection" - only show observations if state differs from previous digest
-- [ ] Move stable/unchanged observations to a collapsible "Housekeeping" section
-- [ ] Filter out "consistently X state" observations unless they persist 7+ days
+- [x] Add "change detection" - only show observations if state differs from previous digest
+- [x] Move stable/unchanged observations to a collapsible "Housekeeping" section
+- [x] Filter out "consistently X state" observations unless they persist 7+ days
 - [x] Prompt engineering: instruct Gemini to distinguish between "noteworthy" vs "just data"
 
 **Files**: `server/services/analyzer.js` (prompt), `ui/index.html` (collapsible section)

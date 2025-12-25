@@ -11,6 +11,13 @@ async function init() {
     await loadStatus();
     await loadDigestStatus();
     setupEventListeners();
+
+    // Cleanup old digests (older than 7 days)
+    try {
+        await fetch('api/digest/cleanup', { method: 'POST' });
+    } catch (e) {
+        console.log('Digest cleanup skipped');
+    }
 }
 
 // ============================================
@@ -65,6 +72,14 @@ function setDigestView(digestType) {
 
     // Store current type globally
     window.currentDigestType = digestType;
+
+    // Update title based on tab
+    const titleEl = document.getElementById('main-title');
+    if (titleEl) {
+        titleEl.textContent = digestType === 'weekly'
+            ? 'Home Assistant Weekly Digest'
+            : 'Home Assistant Daily Digest';
+    }
 
     // Update "Next Digest" display based on selected type
     updateNextDigestDisplay(digestType);
@@ -483,7 +498,8 @@ function renderDigestCards(digestData) {
                 return `<li><span class="status-dot status-good"></span>${p}</li>`;
             }
             const statusClass = p.status === 'warning' ? 'status-warning' :
-                p.status === 'info' ? 'status-info' : 'status-good';
+                p.status === 'critical' ? 'status-critical' :
+                    p.status === 'info' ? 'status-info' : 'status-good';
             return `<li><span class="status-dot ${statusClass}"></span>${p.text}</li>`;
         }).join('');
         html += createDigestCard({
@@ -517,17 +533,37 @@ function renderDigestCards(digestData) {
         });
     }
 
-    // 4. Observations (Blue)
+    // 4. Observations (Blue) - with Note/Ignore buttons
     if (digestData.observations && digestData.observations.length > 0) {
-        digestData.observations.forEach(item => {
+        digestData.observations.forEach((item, idx) => {
             html += createDigestCard({
                 type: 'observation',
                 icon: 'analytics',
                 title: item.title,
                 desc: item.description,
-                footer: item.trend ? `Trend: ${item.trend}` : null
+                footer: item.trend ? `Trend: ${item.trend}` : null,
+                showActions: true,
+                itemId: `observation-${idx}`
             });
         });
+    }
+
+    // 4.1 Housekeeping (Gray/Collapsible)
+    if (digestData.housekeeping && digestData.housekeeping.length > 0) {
+        const housekeepingItems = digestData.housekeeping.map(item => {
+            return `<li class="housekeeping-item"><strong>${item.title}:</strong> ${item.description}</li>`;
+        }).join('');
+
+        html += `
+        <details class="digest-card-full housekeeping-section">
+            <summary class="housekeeping-summary">
+                <span class="housekeeping-icon">${getIconSvg('analytics')}</span>
+                <span>Housekeeping / Unchanged (${digestData.housekeeping.length})</span>
+                <span class="housekeeping-chevron">▼</span>
+            </summary>
+            <ul class="housekeeping-list">${housekeepingItems}</ul>
+        </details>
+        `;
     }
 
     // 4. All Good Items (Green) - Things working well
@@ -539,26 +575,34 @@ function renderDigestCards(digestData) {
 
     // 5. Summary Block - Now explicitly at the bottom above the tip
     if (digestData.summary) {
+        const summaryId = 'system-insight';
         html += `
-            <div class="digest-summary-block">
+            <div class="digest-summary-block digest-card-clickable" data-item-id="${summaryId}" onclick="showGenericDetails('${summaryId}', 'System Insight', ${JSON.stringify(digestData.summary).replace(/'/g, "&#39;")})">
+                <span class="info-indicator">${getIconSvg('info')}</span>
                 <div class="summary-block-label">
                     ${getIconSvg('insight')}
                     <span>System Insight</span>
                 </div>
                 <div class="summary-block-text">${digestData.summary}</div>
+                <div class="card-actions summary-actions">
+                    <button class="action-btn" onclick="event.stopPropagation(); showFeedbackModal('System Insight')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Note</button>
+                    <button class="action-btn action-btn-muted" onclick="event.stopPropagation(); dismissWarning('System Insight')"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 9l-6 6M9 9l6 6"/></svg>Ignore</button>
+                </div>
             </div>
         `;
     }
 
-    // 6. Tip (Gold) - Actionable tip at the end
+    // 6. Tip (Gold) - Actionable tip at the end with Note/Ignore buttons
     if (digestData.tip) {
         // Handle both old string format and new object format
         let tipContent;
+        let tipTitle = 'Tip of the Day';
         if (typeof digestData.tip === 'string') {
             // Legacy: tip is just a string
             tipContent = digestData.tip;
         } else {
             // New format: tip is an object - just show title and action (reason is redundant)
+            tipTitle = digestData.tip.title || 'Tip of the Day';
             tipContent = `
                 <strong>${digestData.tip.title || 'Tip'}</strong><br>
                 ${digestData.tip.action || ''}
@@ -567,37 +611,45 @@ function renderDigestCards(digestData) {
         html += createDigestCard({
             type: 'tip',
             icon: 'lightbulb',
-            title: 'Tip of the Day',
+            title: tipTitle,
             desc: tipContent,
-            className: 'digest-card-full'
+            className: 'digest-card-full',
+            showActions: true,
+            itemId: 'tip-of-day'
         });
     }
 
     return html;
 }
 
-function createDigestCard({ type, icon, title, desc, footer, detailedInfo, itemId, className = '' }) {
+function createDigestCard({ type, icon, title, desc, footer, detailedInfo, itemId, className = '', showActions = false }) {
     const iconSvg = getIconSvg(icon);
+    const escapedTitle = title.replace(/'/g, "\\'");
 
-    // Build action buttons for attention cards
+    // Build action buttons for attention cards OR any card with showActions
     let actionsHtml = '';
-    if (type === 'attention') {
-        const infoBtn = detailedInfo
-            ? `<button class="action-btn" onclick="showIssueDetails('${itemId}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Info</button>`
-            : '';
-        const noteBtn = `<button class="action-btn" onclick="showFeedbackModal('${title.replace(/'/g, "\\'")}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Note</button>`;
-        const ignoreBtn = `<button class="action-btn action-btn-muted" onclick="dismissWarning('${title.replace(/'/g, "\\'")}')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>Ignore</button>`;
+    if (type === 'attention' || showActions) {
+        const noteBtn = `<button class="action-btn" onclick="event.stopPropagation(); showFeedbackModal('${escapedTitle}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Note</button>`;
+        const ignoreBtn = `<button class="action-btn action-btn-muted" onclick="event.stopPropagation(); dismissWarning('${escapedTitle}')"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 9l-6 6M9 9l6 6"/></svg>Ignore</button>`;
 
-        actionsHtml = `<div class="card-actions">${infoBtn}${noteBtn}${ignoreBtn}</div>`;
+        actionsHtml = `<div class="card-actions">${noteBtn}${ignoreBtn}</div>`;
     }
+
+    // Info indicator SVG
+    const infoIndicator = `<span class="info-indicator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>`;
 
     // Store detailed info in a data attribute for the modal
     const dataAttr = (detailedInfo && itemId)
         ? `data-item-id="${itemId}" data-detailed='${JSON.stringify(detailedInfo).replace(/'/g, "&#39;")}'`
-        : '';
+        : itemId ? `data-item-id="${itemId}"` : '';
+
+    // Card is clickable if it has an itemId (attention items have detailed info)
+    const clickHandler = itemId ? `onclick="showIssueDetails('${itemId}')"` : '';
+    const clickableClass = itemId ? 'digest-card-clickable' : '';
 
     return `
-    <div class="digest-card-item digest-card-${type} ${className}" ${dataAttr}>
+    <div class="digest-card-item digest-card-${type} ${className} ${clickableClass}" ${dataAttr} ${clickHandler}>
+        ${infoIndicator}
         <div class="digest-card-header">
             <div class="digest-card-icon">${iconSvg}</div>
             <div class="digest-card-title">${title}</div>
@@ -649,7 +701,8 @@ function getIconSvg(name) {
         'check_circle': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`,
         'lightbulb': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6A4.997 4.997 0 0 1 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/></svg>`,
         'insight': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>`, // Trending up/insight icon
-        'dismiss': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>` // Close/X icon
+        'dismiss': `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`, // Close/X icon
+        'info': `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>` // Info circle icon
     };
     return icons[name] || icons['analytics'];
 }
@@ -676,8 +729,11 @@ function showIssueDetails(itemId) {
     const card = document.querySelector(`[data-item-id="${itemId}"]`);
     if (!card) return;
 
-    const title = card.querySelector('.digest-card-title')?.textContent || 'Issue Details';
-    const severity = card.querySelector('.digest-card-footer')?.textContent?.replace('Severity: ', '') || 'warning';
+    const title = card.querySelector('.digest-card-title')?.textContent ||
+        card.querySelector('.summary-block-label span')?.textContent || 'Details';
+    const description = card.querySelector('.digest-card-desc')?.textContent ||
+        card.querySelector('.summary-block-text')?.textContent || '';
+    const severity = card.querySelector('.digest-card-footer')?.textContent?.replace('Severity: ', '') || '';
 
     let detailedInfo = {};
     try {
@@ -687,6 +743,12 @@ function showIssueDetails(itemId) {
         }
     } catch (e) {
         console.error('Failed to parse detailed info:', e);
+    }
+
+    // If no detailed info, use showGenericDetails instead
+    if (!detailedInfo.explanation && !detailedInfo.suggestions && !detailedInfo.troubleshooting) {
+        showGenericDetails(itemId, title, description);
+        return;
     }
 
     // Build modal content
@@ -757,6 +819,51 @@ function showIssueDetails(itemId) {
 }
 
 /**
+ * Show generic details modal for items without detailed_info (observations, tips, system insight)
+ */
+function showGenericDetails(itemId, title, content) {
+    const escapedTitle = title.replace(/'/g, "\\'");
+
+    const modalHtml = `
+    <div class="modal-overlay active" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3>${title}</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <p>${content}</p>
+                </div>
+            </div>
+            <div class="modal-footer modal-footer-actions">
+                <button class="action-btn" onclick="closeModal(); showFeedbackModal('${escapedTitle}');">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    Add Note
+                </button>
+                <button class="action-btn action-btn-muted" onclick="closeModal(); dismissWarning('${escapedTitle}');">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+                    Ignore
+                </button>
+            </div>
+        </div>
+    </div>
+    `;
+
+    // Remove existing modal if any
+    const existingModal = document.querySelector('.modal-overlay');
+    if (existingModal) existingModal.remove();
+
+    // Add modal to body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+// Make showGenericDetails available globally
+window.showGenericDetails = showGenericDetails;
+
+/**
  * Close the modal
  */
 function closeModal(event) {
@@ -806,12 +913,15 @@ function renderDigestListItems(digestsToRender, allDigests) {
     return digestsToRender.map(digest => {
         const isCurrent = digest.id === latestId;
         const d = new Date(digest.timestamp);
-        const dateStr = d.toLocaleString(undefined, {
+        // Format without comma: "12/20/2025 2:14:40 PM"
+        const dateStr = d.toLocaleDateString(undefined, {
             year: 'numeric',
             month: 'numeric',
-            day: 'numeric',
+            day: 'numeric'
+        }) + ' ' + d.toLocaleTimeString(undefined, {
             hour: 'numeric',
-            minute: '2-digit'
+            minute: '2-digit',
+            second: '2-digit'
         });
 
         // Label logic: "Current" (bold, no date) or Date

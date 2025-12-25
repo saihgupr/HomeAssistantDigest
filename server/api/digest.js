@@ -87,6 +87,28 @@ router.get('/list', (req, res) => {
 });
 
 /**
+ * POST /api/digest/cleanup
+ * Delete digests older than 7 days
+ */
+const { deleteOldDigests } = require('../db/digests');
+
+router.post('/cleanup', (req, res) => {
+    try {
+        const days = parseInt(req.query.days) || 7;
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - days);
+
+        deleteOldDigests(cutoffDate.toISOString());
+        console.log(`Cleaned up digests older than ${days} days`);
+
+        res.json({ success: true, deletedBefore: cutoffDate.toISOString() });
+    } catch (error) {
+        console.error('Cleanup digests error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+/**
  * GET /api/digest/notes
  * Get all user notes - MUST be before /:id to avoid route conflict
  */
