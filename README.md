@@ -126,7 +126,7 @@ Notifications are sent automatically after each digest is generated using your c
 
 1. Add this repository to your Home Assistant add-on store:
    ```
-   https://github.com/YOUR_USERNAME/ha-digest
+   https://codeberg.org/DiggingForDinos/ha-addons
    ```
 2. Install the **HA Digest** add-on
 3. Configure your Gemini API key in the add-on settings
