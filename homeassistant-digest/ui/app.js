@@ -280,6 +280,16 @@ function updateUIState(status) {
         updateSetupSteps(status);
     }
 
+    // Enable/Disable Generate button based on profile completion
+    const generateDigestBtn = document.getElementById('generate-digest');
+    if (generateDigestBtn) {
+        if (status.profileComplete) {
+            generateDigestBtn.classList.remove('hidden');
+        } else {
+            generateDigestBtn.classList.add('hidden');
+        }
+    }
+
     // Enable start setup button - simplified 2-step flow
     const startSetupBtn = document.getElementById('start-setup');
     if (startSetupBtn) {

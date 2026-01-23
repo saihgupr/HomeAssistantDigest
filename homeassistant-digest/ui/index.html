@@ -43,6 +43,30 @@
         </header>
 
         <main class="main">
+            <!-- Setup Card (shown when not fully configured) -->
+            <section class="card setup-card" id="setup-card">
+                <h2>Getting Started</h2>
+                <div class="steps">
+                    <div class="step" id="step-1">
+                        <span class="step-number">1</span>
+                        <div class="step-content">
+                            <h3>Configure API Key</h3>
+                            <p>Add your Google Gemini API key in the add-on configuration.</p>
+                        </div>
+                    </div>
+                    <div class="step" id="step-2">
+                        <span class="step-number">2</span>
+                        <div class="step-content">
+                            <h3>Set Up Home Profile</h3>
+                            <p>Answer a few quick questions about your home. We'll automatically monitor everything for
+                                you!</p>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="start-setup" disabled>
+                    Start Setup
+                </button>
+            </section>
             <!-- Status Card -->
             <section class="card status-card">
                 <h2>System Status</h2>
@@ -73,37 +97,12 @@
                     </div>
                 </div>
                 <div class="status-actions">
-                    <button class="btn btn-sm btn-secondary" id="generate-digest">
+                    <button class="btn btn-sm btn-secondary hidden" id="generate-digest">
                         Generate Now
                     </button>
 
                     <div id="action-status" class="action-status"></div>
                 </div>
-            </section>
-
-            <!-- Setup Card (shown when not fully configured) -->
-            <section class="card setup-card" id="setup-card">
-                <h2>Getting Started</h2>
-                <div class="steps">
-                    <div class="step" id="step-1">
-                        <span class="step-number">1</span>
-                        <div class="step-content">
-                            <h3>Configure API Key</h3>
-                            <p>Add your Google Gemini API key in the add-on configuration.</p>
-                        </div>
-                    </div>
-                    <div class="step" id="step-2">
-                        <span class="step-number">2</span>
-                        <div class="step-content">
-                            <h3>Set Up Home Profile</h3>
-                            <p>Answer a few quick questions about your home. We'll automatically monitor everything for
-                                you!</p>
-                        </div>
-                    </div>
-                </div>
-                <button class="btn btn-primary" id="start-setup" disabled>
-                    Start Setup
-                </button>
             </section>
 
 

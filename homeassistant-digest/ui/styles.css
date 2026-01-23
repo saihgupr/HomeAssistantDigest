@@ -2419,6 +2419,113 @@ body {
 }
 
 /* ============================================
+   Form Elements (Setup Wizard)
+   ============================================ */
+
+.input,
+.textarea {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.input:focus,
+.textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(100, 150, 255, 0.1);
+}
+
+.select-options,
+.multi-select-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.select-option,
+.multi-select-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.select-option:hover,
+.multi-select-option:hover {
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Highlight selected option */
+.select-option:has(input:checked),
+.multi-select-option:has(input:checked) {
+    border-color: var(--accent);
+    background: rgba(100, 150, 255, 0.05);
+}
+
+.select-option input[type="radio"],
+.multi-select-option input[type="checkbox"] {
+    accent-color: var(--accent);
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-top: 0.1rem;
+}
+
+.option-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.option-label {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.option-desc {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+    line-height: 1.4;
+}
+
+.form-field {
+    margin-bottom: 1rem;
+}
+
+.form-field label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.optional-note {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
+/* ============================================
    Responsive
    ============================================ */
 
