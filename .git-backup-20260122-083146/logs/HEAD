@@ -1,0 +1,83 @@
+0000000000000000000000000000000000000000 3cc251db30fc079d14a364c1b1d19dd8cd93c260 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766081313 -0500	commit (initial): Initial commit
+3cc251db30fc079d14a364c1b1d19dd8cd93c260 b48c81330500aa5d77bf40bd9b28aac3fcd15101 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766082194 -0500	commit: Phase 1
+b48c81330500aa5d77bf40bd9b28aac3fcd15101 6e908ecb4f8acd82c9add171cd1fe2752cbb5eaf saihgupr <121105543+saihgupr@users.noreply.github.com> 1766082876 -0500	commit: Phase 2 web ui
+6e908ecb4f8acd82c9add171cd1fe2752cbb5eaf 20f4eeb3f8f3038320e905baab70c3c33a38d801 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766083361 -0500	commit: Phase 3
+20f4eeb3f8f3038320e905baab70c3c33a38d801 a903fd09bdb61929cd3ad731290893e4bcd9308a saihgupr <121105543+saihgupr@users.noreply.github.com> 1766083631 -0500	commit: Phase 4
+a903fd09bdb61929cd3ad731290893e4bcd9308a c3dec998282ec0675e53a00d825dc25293a93b42 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766084073 -0500	commit: Phase 5
+c3dec998282ec0675e53a00d825dc25293a93b42 f0ddecb25c71bf873d7907d91c67621ca47e4807 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766084465 -0500	commit: Gemini api
+f0ddecb25c71bf873d7907d91c67621ca47e4807 8317a42eb85bde66e99a6b1a4c88cfd330ae4338 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766085005 -0500	commit: Dashboard ui
+8317a42eb85bde66e99a6b1a4c88cfd330ae4338 7cdb53344d9f09b966dc035575c47e38cc45123f saihgupr <121105543+saihgupr@users.noreply.github.com> 1766085972 -0500	commit: Phase 5
+7cdb53344d9f09b966dc035575c47e38cc45123f 9530f5c6b58d21d229ac1052cb12a9601559967e saihgupr <121105543+saihgupr@users.noreply.github.com> 1766087087 -0500	commit: Theme ui options
+9530f5c6b58d21d229ac1052cb12a9601559967e 68c1fb83c454ba58de5a517ddeea8bcf9358dae7 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766087535 -0500	commit: Planets
+68c1fb83c454ba58de5a517ddeea8bcf9358dae7 88b11d1e3f85f443d0a95e707771eb52a919f969 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766087909 -0500	commit: Planets 2
+88b11d1e3f85f443d0a95e707771eb52a919f969 9c02488ee780a75a5ea19b9fa61dfcdac7d9b197 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766088749 -0500	commit: Layout options
+9c02488ee780a75a5ea19b9fa61dfcdac7d9b197 2301074f4c2cec786476995c9abac224b0f7615a saihgupr <121105543+saihgupr@users.noreply.github.com> 1766089462 -0500	commit: Third options slider
+2301074f4c2cec786476995c9abac224b0f7615a 9c02488ee780a75a5ea19b9fa61dfcdac7d9b197 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766089625 -0500	reset: moving to 9c02488ee780a75a5ea19b9fa61dfcdac7d9b197
+9c02488ee780a75a5ea19b9fa61dfcdac7d9b197 88b11d1e3f85f443d0a95e707771eb52a919f969 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766089754 -0500	reset: moving to 88b11d1e3f85f443d0a95e707771eb52a919f969
+88b11d1e3f85f443d0a95e707771eb52a919f969 68c1fb83c454ba58de5a517ddeea8bcf9358dae7 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766089829 -0500	reset: moving to 68c1fb83c454ba58de5a517ddeea8bcf9358dae7
+68c1fb83c454ba58de5a517ddeea8bcf9358dae7 9530f5c6b58d21d229ac1052cb12a9601559967e saihgupr <121105543+saihgupr@users.noreply.github.com> 1766089865 -0500	reset: moving to 9530f5c6b58d21d229ac1052cb12a9601559967e
+9530f5c6b58d21d229ac1052cb12a9601559967e 9c02488ee780a75a5ea19b9fa61dfcdac7d9b197 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766090199 -0500	reset: moving to 9c02488ee780a75a5ea19b9fa61dfcdac7d9b197
+9c02488ee780a75a5ea19b9fa61dfcdac7d9b197 9c02488ee780a75a5ea19b9fa61dfcdac7d9b197 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766091600 -0500	reset: moving to HEAD
+9c02488ee780a75a5ea19b9fa61dfcdac7d9b197 ac2d96ec62c8b783afa2f1b7ec3e203c6f3437d2 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766093082 -0500	commit: Gemini additions
+ac2d96ec62c8b783afa2f1b7ec3e203c6f3437d2 db1063051d11eb3e06560fbfdc20bfa8415c835b saihgupr <121105543+saihgupr@users.noreply.github.com> 1766093158 -0500	commit: Package for HA
+db1063051d11eb3e06560fbfdc20bfa8415c835b 63cb94b35273494d0f3defce2274c542a5c64138 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766093680 -0500	commit: Installs in HA
+63cb94b35273494d0f3defce2274c542a5c64138 aa1bf3294b8ce61833b3e744e9ff98696b71e29a saihgupr <121105543+saihgupr@users.noreply.github.com> 1766094692 -0500	commit: Api key comes in
+aa1bf3294b8ce61833b3e744e9ff98696b71e29a 227bfb5fb3545de4d09b4d54e1df3b0c6a6e5aff saihgupr <121105543+saihgupr@users.noreply.github.com> 1766095042 -0500	commit: Setup 1 works
+227bfb5fb3545de4d09b4d54e1df3b0c6a6e5aff 19314dfd40a6db59bb32e33a021223ce06d80e53 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766096887 -0500	commit: Devices button worked
+19314dfd40a6db59bb32e33a021223ce06d80e53 8987a86cf8ed165446cbb1a50e057c0a9b07480b saihgupr <121105543+saihgupr@users.noreply.github.com> 1766097283 -0500	commit: Better ui for devices
+8987a86cf8ed165446cbb1a50e057c0a9b07480b 75368b98691e99eaa156eabc2ee8d8c691f3b17c saihgupr <121105543+saihgupr@users.noreply.github.com> 1766097774 -0500	commit: Ignoring the entities onboarding process
+75368b98691e99eaa156eabc2ee8d8c691f3b17c f17cf1d117107945ef30737766c194f4c6ce5122 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766098439 -0500	commit: Addons in analysis
+f17cf1d117107945ef30737766c194f4c6ce5122 d385ac0073bce1e5aae67a3276feb145a7e0c625 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766098648 -0500	commit: Digests work
+d385ac0073bce1e5aae67a3276feb145a7e0c625 abbf545953d0253f6091454ca70a8c5e36ab925f saihgupr <121105543+saihgupr@users.noreply.github.com> 1766098918 -0500	commit: More relaxed battery level warnings
+abbf545953d0253f6091454ca70a8c5e36ab925f 8bed9f988c3e72f4e50f31f6ee29cb5403fd11e4 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766099598 -0500	commit: Digest update
+8bed9f988c3e72f4e50f31f6ee29cb5403fd11e4 d790810a475a9e4f6486da6f16551f32ddd18e4e saihgupr <121105543+saihgupr@users.noreply.github.com> 1766099798 -0500	commit: Less integration issues
+d790810a475a9e4f6486da6f16551f32ddd18e4e 4e15c8e1d692d9bca5436ea1090ea00be0380f7b saihgupr <121105543+saihgupr@users.noreply.github.com> 1766099871 -0500	commit: Fix main message backgroud
+4e15c8e1d692d9bca5436ea1090ea00be0380f7b 4a9bf3d6deceaa0004541ef65406e03943c4c222 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766100885 -0500	commit: Daily weekly view
+4a9bf3d6deceaa0004541ef65406e03943c4c222 070e1e167a69ce3f7974e900c34e09f06b58b71b saihgupr <121105543+saihgupr@users.noreply.github.com> 1766101040 -0500	commit: Only one top toggle
+070e1e167a69ce3f7974e900c34e09f06b58b71b 1797f4067d03817a2ca130c83432306f4b7e56bc saihgupr <121105543+saihgupr@users.noreply.github.com> 1766101147 -0500	commit: Removed view text
+1797f4067d03817a2ca130c83432306f4b7e56bc 82e2ff22c354fb6fcbe62f7c11bbccbe2c088ecb saihgupr <121105543+saihgupr@users.noreply.github.com> 1766101751 -0500	commit: Battery predictions
+82e2ff22c354fb6fcbe62f7c11bbccbe2c088ecb d03bd9a89465117b658ed0718a6e26e049857f64 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766102301 -0500	commit: Dismiss button
+d03bd9a89465117b658ed0718a6e26e049857f64 7de41728335cc447cb50d38b0c3e70096ac5c08c saihgupr <121105543+saihgupr@users.noreply.github.com> 1766103644 -0500	commit: Weekly digest tab
+7de41728335cc447cb50d38b0c3e70096ac5c08c 75152dbb4907b64e837f6533d4eb352e71b38127 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766103829 -0500	commit: Weekly digest schedule
+75152dbb4907b64e837f6533d4eb352e71b38127 b01dc1b83307f3202523197d27a26f0fa10459df saihgupr <121105543+saihgupr@users.noreply.github.com> 1766104111 -0500	commit: Add weekly schedule option
+b01dc1b83307f3202523197d27a26f0fa10459df 8942bbc124b485f6704021bde6854f31c969d161 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766106559 -0500	commit: No dialiy digests yet
+8942bbc124b485f6704021bde6854f31c969d161 3eae6281827073edc36946c1e6c56c6b0010fea0 saihgupr <121105543+saihgupr@users.noreply.github.com> 1766106698 -0500	commit: Emoji removed
+3eae6281827073edc36946c1e6c56c6b0010fea0 fdfdad3a6fdd4778973383628dcf4a54023c43d2 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766178499 -0500	commit: Todo
+fdfdad3a6fdd4778973383628dcf4a54023c43d2 d8856e9883a0a9b382540f362904153c2b18b198 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766179289 -0500	commit: Update
+d8856e9883a0a9b382540f362904153c2b18b198 4edcee89a22d5f6e956cb2bb66a7c02640177a20 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766179512 -0500	commit: Added logs to analyse
+4edcee89a22d5f6e956cb2bb66a7c02640177a20 a8290d126c7100dd7456be868692d294ff235a8a DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766179670 -0500	commit: Notifications
+a8290d126c7100dd7456be868692d294ff235a8a e4466db7f674ceffe797d3c6a106878275167226 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766179912 -0500	commit: Todo complete
+e4466db7f674ceffe797d3c6a106878275167226 07571a2a6ac17d3feeeacdfc826236f1e7f87e9a DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766180610 -0500	commit: Green box down blue box up
+07571a2a6ac17d3feeeacdfc826236f1e7f87e9a f02ebe55bd43af974f8ca65687b58ca90d21bd55 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766180720 -0500	commit: Padding fix
+f02ebe55bd43af974f8ca65687b58ca90d21bd55 00cac72b7cc003364862a7b8fb9238b018ee8ad1 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766180913 -0500	commit: Better font
+00cac72b7cc003364862a7b8fb9238b018ee8ad1 28bd27ad553348bb6398353e93789436487b8d44 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766181116 -0500	commit: Better button placement
+28bd27ad553348bb6398353e93789436487b8d44 ffed63a9a04316cd9b2c503338973fef0f534d93 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766181919 -0500	commit: Info
+ffed63a9a04316cd9b2c503338973fef0f534d93 a462c243753cf48739576334fa055eb6980585c1 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766182075 -0500	commit: Single button
+a462c243753cf48739576334fa055eb6980585c1 846065bb934072059c029981f08ad1ab750cc73b DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766182352 -0500	commit: Systems insights
+846065bb934072059c029981f08ad1ab750cc73b e68e531d3914f7e2a27d901e362f65e5bada7a32 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766182893 -0500	commit: Deploy update
+e68e531d3914f7e2a27d901e362f65e5bada7a32 05c182bf511dd1c7628544ebcb293c8f4321288c DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766183297 -0500	commit: Smarter ai prompts
+05c182bf511dd1c7628544ebcb293c8f4321288c 3f2ffd0a90086dc614713681498fae1f09c292f9 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766185300 -0500	commit: App.js update
+3f2ffd0a90086dc614713681498fae1f09c292f9 c5faa6e441376f3c7cc8739f7f1a093ba894bfb8 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766185604 -0500	commit: Update prompts
+c5faa6e441376f3c7cc8739f7f1a093ba894bfb8 67d666bb14e668a33b7be9d898dd067d7155ace5 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766188709 -0500	commit: More data
+67d666bb14e668a33b7be9d898dd067d7155ace5 cde7f19b4140711973aaeca14533d7e4f6401f61 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766189412 -0500	commit: Improved data quality
+cde7f19b4140711973aaeca14533d7e4f6401f61 3a65b6c325ce0894240b08ea5114585b880c53d3 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766191611 -0500	commit: Data quality outlier detection
+3a65b6c325ce0894240b08ea5114585b880c53d3 49a692bf576991054673d4d7f147ea65da8fb4d9 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766240632 -0500	commit: Images update
+49a692bf576991054673d4d7f147ea65da8fb4d9 ac49995ebc67032185f28f7c990a677842340390 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766241514 -0500	commit: Notes
+ac49995ebc67032185f28f7c990a677842340390 57e250e9701bd50413f8cf3753fee494a7f953a2 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766242214 -0500	commit: Feedback
+57e250e9701bd50413f8cf3753fee494a7f953a2 60a4717890061399239b1f0f85785105c2222eb9 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766242302 -0500	commit: Top bar
+60a4717890061399239b1f0f85785105c2222eb9 087b59d22bfed693b9db978a695ae846e8d26693 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766242698 -0500	commit: Top bar
+087b59d22bfed693b9db978a695ae846e8d26693 1fafebbfdb7536af4b999eaa8c317107e1ba25a6 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766243253 -0500	commit: Notes fix
+1fafebbfdb7536af4b999eaa8c317107e1ba25a6 2e801e4ba7104777cb7381e6c5676817bd02d1a0 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766243429 -0500	commit: Better button placement
+2e801e4ba7104777cb7381e6c5676817bd02d1a0 0a4dae8ad4122c069a125f1ef43fdef633c0549c DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766243652 -0500	commit: Padding for notes buttons
+0a4dae8ad4122c069a125f1ef43fdef633c0549c f8ef172c504d1fcc3dfd9ecb032526c511223a35 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766246640 -0500	commit: Notes are in tab
+f8ef172c504d1fcc3dfd9ecb032526c511223a35 558aa58d10b79f4b2d65681736b6d45661a34109 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766248465 -0500	commit: Bottom part text
+558aa58d10b79f4b2d65681736b6d45661a34109 407359e8cfd1bdf5286c9d174666b2181269832a DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766248650 -0500	commit: Tip of the day
+407359e8cfd1bdf5286c9d174666b2181269832a bd7fe1ba39f9248395061ead78a1f0d642e9df79 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766249355 -0500	commit: Update examples
+bd7fe1ba39f9248395061ead78a1f0d642e9df79 eebc7756ada34d21b21794b135cdf4d32bcecab2 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766255271 -0500	commit: Fix time bug
+eebc7756ada34d21b21794b135cdf4d32bcecab2 6534518f53b3f34d9b2fa5c725c8c5e681f19289 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766255374 -0500	commit: 24hr time
+6534518f53b3f34d9b2fa5c725c8c5e681f19289 14af9947dc2bda538639cb84bf2e99961f83f255 DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1766687971 -0500	commit: Successful digest generation
+14af9947dc2bda538639cb84bf2e99961f83f255 e6b91d7a131950ac50adf7d032a6ed450a483f2d DiggingForDinos <250208922+DiggingForDinos@users.noreply.github.com> 1767887260 -0500	commit: docs: point to Codeberg add-on repository
+e6b91d7a131950ac50adf7d032a6ed450a483f2d ef8ecc5a4f44c4e21cedf69f7228f647333a748c saihgupr <121105543+saihgupr@users.noreply.github.com> 1769008464 -0500	commit: Readme Update
+ef8ecc5a4f44c4e21cedf69f7228f647333a748c 06389b3bfa03e002f0dce9f87832a51913234440 saihgupr <121105543+saihgupr@users.noreply.github.com> 1769009000 -0500	commit: Generate profile on top
+06389b3bfa03e002f0dce9f87832a51913234440 b0435ffed9ecb2b585bace95ff07a0debc54d57d saihgupr <121105543+saihgupr@users.noreply.github.com> 1769009592 -0500	commit: Backgrounds cleanup on setup profile
+b0435ffed9ecb2b585bace95ff07a0debc54d57d c8a3fd252a9f8f4e7503ba9d23e389a90131a1d9 saihgupr <121105543+saihgupr@users.noreply.github.com> 1769088695 -0500	commit: Update
