@@ -1,7 +1,7 @@
 {
   "name": "ha-digest",
-  "version": "0.1.1",
-  "description": "AI-powered daily health reports for your smart home",
+  "version": "0.1.99",
+  "description": "RICHIE DEBUG: AI-powered daily health reports for your smart home",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
