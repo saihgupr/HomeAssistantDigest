@@ -130,7 +130,7 @@ async function generateDigest(type = 'daily') {
             }],
             generationConfig: {
                 temperature: 0.4, // Lower temperature for more consistent JSON
-                maxOutputTokens: 8192,
+                maxOutputTokens: 16384, // Increased limit to allow for reasoning + JSON
                 topP: 0.9,
                 responseMimeType: "application/json" // Force JSON mode
             }
@@ -172,26 +172,63 @@ async function generateDigest(type = 'daily') {
     let jsonContent = content.trim();
 
     // Strip markdown code blocks if present (```json ... ``` or ``` ... ```)
-    const codeBlockMatch = jsonContent.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-    if (codeBlockMatch) {
-        jsonContent = codeBlockMatch[1].trim();
+    // Be resilient to missing closing triple-backticks
+    if (jsonContent.includes('```')) {
+        const parts = jsonContent.split('```');
+        for (let i = 0; i < parts.length; i++) {
+            const part = parts[i].trim();
+            if (part.startsWith('{') || part.toLowerCase().startsWith('json')) {
+                jsonContent = part;
+                if (jsonContent.toLowerCase().startsWith('json')) {
+                    jsonContent = jsonContent.substring(4).trim();
+                }
+                break;
+            }
+        }
     }
 
-    // Find the first { and last } to extract just the JSON object
+    // Find the first { and attempt to extract everything from there
     const firstBrace = jsonContent.indexOf('{');
-    const lastBrace = jsonContent.lastIndexOf('}');
-    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-        jsonContent = jsonContent.substring(firstBrace, lastBrace + 1);
+    if (firstBrace !== -1) {
+        jsonContent = jsonContent.substring(firstBrace);
+
+        // Attempt to find the last } to see if we have a complete-looking object
+        const lastBrace = jsonContent.lastIndexOf('}');
+        if (lastBrace !== -1) {
+            const candidate = jsonContent.substring(0, lastBrace + 1);
+            try {
+                // If it parses as is, we're good
+                JSON.parse(candidate);
+                jsonContent = candidate;
+            } catch (e) {
+                // If it doesn't parse, it might be that the last } wasn't the correct one (nested braces)
+                // or the JSON is truncated. We'll keep it as is and let the repair logic handle it.
+                // We'll only cut at lastBrace if we're reasonably sure it's the end (low risk of cutting off valid data)
+                console.log('[Digest] Candidate JSON within braces failed to parse, keeping full content for repair.');
+            }
+        }
     }
 
     try {
         parsedContent = JSON.parse(jsonContent);
     } catch (e) {
-        console.error('Failed to parse Gemini JSON:', content);
-        console.error('Extraction attempted:', jsonContent.substring(0, 500));
-        console.error('Parse error:', e.message);
-        const preview = content.substring(0, 300);
-        throw new Error(`Gemini returned invalid JSON. Error: ${e.message}. Preview: ${preview}...`);
+        console.error('[Digest] Failed to parse Gemini JSON:', content);
+        console.error('[Digest] Extraction attempted:', jsonContent.substring(0, 500));
+
+        // Attempt simple repair if it looks like truncation
+        if (e.message.toLowerCase().includes('unexpected end') || e.message.toLowerCase().includes('expected \',\' or \']\'')) {
+            console.log('[Digest] Attempting to repair truncated JSON...');
+            try {
+                const repairedJson = repairTruncatedJson(jsonContent);
+                parsedContent = JSON.parse(repairedJson);
+                console.log('[Digest] Successfully repaired and parsed JSON');
+            } catch (repairError) {
+                console.error('[Digest] Repair failed:', repairError.message);
+                throw new Error(`Gemini returned malformed/truncated JSON. Original error: ${e.message}`);
+            }
+        } else {
+            throw new Error(`Gemini returned invalid JSON. Error: ${e.message}. Preview: ${content.substring(0, 300)}...`);
+        }
     }
 
     // extract summary and count for DB headers
@@ -568,7 +605,8 @@ ${userNotes}
 For example, if a user notes "I don't update AdGuard Home", do NOT flag AdGuard updates as attention items.
 ` : ''}
 ${isFirstRun ? 'Since this is the first run with no data yet, attention_items should be EMPTY and the tone should be welcoming.' : ''}
-Do NOT include markdown formatting in the JSON. Return ONLY raw JSON.`;
+
+## IMPORTANT: Keep your internal reasoning/thoughts extremely brief to ensure the JSON response is not truncated. Do NOT include markdown formatting or conversational filler in the JSON output. Return ONLY the raw JSON object starting with { and ending with }.`;
 
     return prompt;
 }
@@ -611,7 +649,98 @@ function getDigestStatus() {
     };
 }
 
+/**
+ * Enhanced utility to attempt repairing truncated JSON
+ */
+function repairTruncatedJson(json) {
+    let repaired = json.trim();
+
+    // Ensure it starts with {
+    if (!repaired.startsWith('{')) {
+        const firstBrace = repaired.indexOf('{');
+        if (firstBrace !== -1) repaired = repaired.substring(firstBrace);
+    }
+
+    // If it's empty after trimming, return empty object
+    if (!repaired) return '{}';
+
+    // Count braces and brackets, tracking open structures
+    let openQuote = false;
+    let escape = false;
+    const stack = [];
+
+    for (let i = 0; i < repaired.length; i++) {
+        const char = repaired[i];
+
+        if (escape) {
+            escape = false;
+            continue;
+        }
+
+        if (char === '\\') {
+            escape = true;
+            continue;
+        }
+
+        if (char === '"' && !escape) {
+            openQuote = !openQuote;
+            continue;
+        }
+
+        if (!openQuote) {
+            if (char === '{' || char === '[') {
+                stack.push(char === '{' ? '}' : ']');
+            } else if (char === '}' || char === ']') {
+                if (stack.length > 0 && stack[stack.length - 1] === char) {
+                    stack.pop();
+                }
+            }
+        }
+    }
+
+    // 1. If we're inside an open quote, close it
+    if (openQuote) {
+        repaired += '"';
+    }
+
+    // 2. Handle dangling keys (e.g., "key": )
+    repaired = repaired.trim();
+    while (repaired.endsWith(':')) {
+        repaired = repaired.slice(0, -1).trim();
+        if (repaired.endsWith('"')) {
+            // Find the start of the key string
+            let j = repaired.length - 2;
+            while (j >= 0 && (repaired[j] !== '"' || repaired[j - 1] === '\\')) {
+                j--;
+            }
+            if (j >= 0) {
+                repaired = repaired.substring(0, j).trim();
+            }
+        }
+        repaired = repaired.trim();
+    }
+
+    // 3. Remove trailing commas
+    repaired = repaired.trim();
+    while (repaired.endsWith(',')) {
+        repaired = repaired.slice(0, -1).trim();
+    }
+
+    // 4. Pop everything from the stack to close remaining structures
+    while (stack.length > 0) {
+        const needed = stack.pop();
+        repaired = repaired.trim();
+        if (repaired.endsWith(',')) {
+            repaired = repaired.slice(0, -1).trim();
+        }
+        repaired += needed;
+    }
+
+    return repaired;
+}
+
 module.exports = {
     generateDigest,
-    getDigestStatus
+    getDigestStatus,
+    repairTruncatedJson
 };

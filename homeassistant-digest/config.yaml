@@ -1,8 +1,8 @@
 name: "Home Assistant Digest"
 description: "AI-powered daily health reports for your smart home"
-version: "0.1.3"
+version: "0.1.4"
 slug: "ha-digest"
-url: "https://github.com/DiggingForDinos/HomeAssistantDigest"
+url: "https://github.com/saihgupr/HomeAssistantDigest"
 arch:
   - aarch64
   - amd64
