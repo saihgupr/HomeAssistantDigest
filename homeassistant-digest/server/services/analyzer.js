@@ -305,7 +305,8 @@ function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, ad
                         entity: data.friendly_name,
                         entity_id: entityId,
                         issue: `Value(s) ${outliers.map(o => o.toFixed(1)).join(', ')} are >3 std dev from mean (${avg.toFixed(1)} ± ${stdDev.toFixed(1)})`,
-                        severity: 'data_quality'
+                        severity: 'data_quality',
+                        category: data.category
                     });
                 }
             }
@@ -450,15 +451,36 @@ ${failureLines.join('\n')}
     // Build data quality issues section
     let dataQualitySection = '';
     if (dataQualityIssues.length > 0) {
-        const dqLines = dataQualityIssues.map(dq =>
-            `- ${dq.entity} (${dq.entity_id}): ${dq.issue}`
-        );
+        // Group by category to reduce prompt size
+        const groupedIssues = {};
+        for (const dq of dataQualityIssues) {
+            const category = dq.category || 'General';
+            if (!groupedIssues[category]) {
+                groupedIssues[category] = [];
+            }
+            groupedIssues[category].push(`${dq.entity} (${dq.issue})`);
+        }
+
+        const dqSummaries = Object.entries(groupedIssues).map(([category, items]) => {
+            if (items.length > 5) {
+                // If many items, summarize to save tokens
+                return `### ${category} Anomalies (${items.length} entities)
+- **Summary**: ${items.length} entities in this category have statistical Data Quality outliers (>3 std dev).
+- **Example entities**: ${items.slice(0, 3).map(i => i.split(' (')[0]).join(', ')}...
+- **Action**: Check for widespread network/sensor issues affecting this category.`;
+            }
+            return `### ${category} Anomalies
+${items.map(i => `- ${i}`).join('\n')}`;
+        });
 
         dataQualitySection = `
 ## Potential Data Quality Issues
-These values appear to be statistical outliers and may indicate sensor glitches:
-${dqLines.join('\n')}
-Use severity "data_quality" for these, not "warning" or "critical".
+${dqSummaries.join('\n')}
+
+IMPORTANT INSTRUCTION FOR DATA QUALITY:
+- Do NOT list every single entity above as a separate attention item.
+- GROUP them into single "Data Quality" attention items (e.g. "Widespread Network Latency" or "Multiple Environmental Sensor Errors").
+- Only create separate items if the issue is unique or critical.
 `;
     }
 
