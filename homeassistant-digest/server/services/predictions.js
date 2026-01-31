@@ -73,7 +73,8 @@ async function getBatteryPredictions() {
             drain_rate_per_day: Math.round(drainRatePerDay * 10) / 10,
             days_remaining: daysRemaining,
             data_points: dataPoints.length,
-            needs_attention: daysRemaining > 0 && daysRemaining <= 30
+            data_points: dataPoints.length,
+            needs_attention: (daysRemaining > 0 && daysRemaining <= 14) || latestValue <= 15
         });
     }
 

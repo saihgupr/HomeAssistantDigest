@@ -296,15 +296,15 @@ function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, ad
             const avgSquaredDiff = squaredDiffs.reduce((a, b) => a + b, 0) / squaredDiffs.length;
             const stdDev = Math.sqrt(avgSquaredDiff);
 
-            // Flag outliers (> 3 standard deviations from mean)
+            // Flag outliers (> 5 standard deviations from mean)
             if (stdDev > 0) {
-                const outliers = numericValues.filter(v => Math.abs(v - avg) > 3 * stdDev);
+                const outliers = numericValues.filter(v => Math.abs(v - avg) > 5 * stdDev);
                 if (outliers.length > 0) {
                     outlierFlag = ' ⚠️ POSSIBLE DATA QUALITY ISSUE';
                     dataQualityIssues.push({
                         entity: data.friendly_name,
                         entity_id: entityId,
-                        issue: `Value(s) ${outliers.map(o => o.toFixed(1)).join(', ')} are >3 std dev from mean (${avg.toFixed(1)} ± ${stdDev.toFixed(1)})`,
+                        issue: `Value(s) ${outliers.map(o => o.toFixed(1)).join(', ')} are >5 std dev from mean (${avg.toFixed(1)} ± ${stdDev.toFixed(1)})`,
                         severity: 'data_quality',
                         category: data.category
                     });
@@ -377,10 +377,14 @@ ${intSummary.join('\n')}
 
     // Build battery predictions section
     let batterySection = '';
-    if (batteryPredictions.length > 0) {
-        const batteryLines = batteryPredictions.map(b => {
-            const warning = b.needs_attention ? ' ⚠️ NEEDS ATTENTION' : '';
-            return `- ${b.friendly_name}: ${b.current_level}% (draining ~${b.drain_rate_per_day}%/day, ~${b.days_remaining} days remaining)${warning}`;
+
+    // Filter to only include batteries that actually need attention
+    // This prevents the LLM from hallucinating issues with healthy batteries
+    const criticalBatteries = batteryPredictions.filter(b => b.needs_attention);
+
+    if (criticalBatteries.length > 0) {
+        const batteryLines = criticalBatteries.map(b => {
+            return `- ${b.friendly_name}: ${b.current_level}% (draining ~${b.drain_rate_per_day}%/day, ~${b.days_remaining} days remaining) ⚠️ NEEDS ATTENTION`;
         });
 
         batterySection = `
