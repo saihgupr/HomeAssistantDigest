@@ -272,6 +272,9 @@ function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, ad
             timestamp: snap.timestamp,
             value: snap.value_num !== null ? snap.value_num : snap.value_str
         });
+        if (snap.attributes) {
+            entityData[snap.entity_id].latestAttributes = snap.attributes;
+        }
     }
 
     // Build entity summary for the prompt + detect data quality outliers
@@ -318,7 +321,7 @@ function buildAnalysisPrompt(profile, entities, entityStats, snapshots, type, ad
             stats = `states: ${uniqueStates.join(', ')}`;
         }
 
-        return `- ${data.friendly_name} (${data.category}, ${data.priority}): ${stats}`;
+        return `- ${data.friendly_name} (${data.category}, ${data.priority}): ${stats}${formatAttributes(data.latestAttributes)}`;
     }).filter(Boolean);
 
     // Build add-on summary
@@ -765,8 +768,42 @@ function repairTruncatedJson(json) {
     return repaired;
 }
 
+/**
+ * Flatten one level of nested attributes into a compact string for the prompt.
+ * Climate integrations built on HA store their interesting values in nested
+ * objects, so "specific_states.ext_current_temperature=6.3" is kept while
+ * arrays such as supported_features are dropped as noise.
+ */
+function formatAttributes(attributes, maxLength = 400) {
+    if (!attributes || typeof attributes !== 'object' || Array.isArray(attributes)) return '';
+
+    const parts = [];
+    for (const [key, value] of Object.entries(attributes)) {
+        if (value === null || value === undefined) continue;
+        if (Array.isArray(value)) continue;
+        if (typeof value === 'object') {
+            for (const [innerKey, innerValue] of Object.entries(value)) {
+                if (innerValue === null || innerValue === undefined) continue;
+                if (typeof innerValue === 'object') continue;
+                parts.push(`${key}.${innerKey}=${innerValue}`);
+            }
+            continue;
+        }
+        parts.push(`${key}=${value}`);
+    }
+
+    if (parts.length === 0) return '';
+
+    let text = parts.join(', ');
+    if (text.length > maxLength) {
+        text = `${text.slice(0, maxLength - 1)}…`;
+    }
+    return ` | attrs: ${text}`;
+}
+
 module.exports = {
     generateDigest,
     getDigestStatus,
-    repairTruncatedJson
+    repairTruncatedJson,
+    formatAttributes
 };

@@ -105,7 +105,12 @@ function extractRelevantAttributes(domain, attributes) {
 
     // Common useful attributes by domain
     const attrMap = {
-        climate: ['current_temperature', 'target_temperature', 'hvac_action', 'preset_mode'],
+        climate: [
+            'current_temperature', 'temperature', 'target_temperature', 'hvac_action',
+            'preset_mode', 'fan_mode', 'swing_mode', 'humidity',
+            'ema_temp', 'power_percent', 'on_percent', 'valve_state',
+            'window_state', 'overpowering', 'is_on'
+        ],
         sensor: ['device_class', 'unit_of_measurement'],
         binary_sensor: ['device_class'],
         light: ['brightness', 'color_temp', 'rgb_color'],
@@ -120,6 +125,26 @@ function extractRelevantAttributes(domain, attributes) {
     for (const key of keysToExtract) {
         if (attributes[key] !== undefined) {
             relevant[key] = attributes[key];
+        }
+    }
+
+    // Climate integrations built on top of HA (Versatile Thermostat, Better
+    // Thermostat) publish their useful data in nested objects such as
+    // specific_states and vtherm_over_switch. Keep those, one level deep, so the
+    // digest can talk about power_percent, tpi coefficients and similar values.
+    if (domain === 'climate') {
+        for (const [key, value] of Object.entries(attributes)) {
+            if (relevant[key] !== undefined) continue;
+            if (!value || typeof value !== 'object' || Array.isArray(value)) continue;
+            const flat = {};
+            for (const [innerKey, innerValue] of Object.entries(value)) {
+                if (innerValue === null || innerValue === undefined) continue;
+                if (typeof innerValue === 'object') continue;
+                flat[innerKey] = innerValue;
+            }
+            if (Object.keys(flat).length > 0) {
+                relevant[key] = flat;
+            }
         }
     }
 
@@ -161,5 +186,6 @@ function getCollectorStatus() {
 module.exports = {
     collectSnapshots,
     cleanupOldData,
-    getCollectorStatus
+    getCollectorStatus,
+    extractRelevantAttributes
 };
