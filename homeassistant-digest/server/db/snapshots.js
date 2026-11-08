@@ -238,6 +238,7 @@ function getAllSnapshotsForAnalysis(startTime, endTime) {
             s.value_type, 
             s.value_num, 
             s.value_str,
+            s.attributes,
             me.friendly_name,
             me.category,
             me.priority
@@ -254,7 +255,17 @@ function getAllSnapshotsForAnalysis(startTime, endTime) {
     const columns = result[0].columns;
     return result[0].values.map(row => {
         const snap = {};
-        columns.forEach((col, i) => snap[col] = row[i]);
+        columns.forEach((col, i) => {
+            if (col === 'attributes' && row[i]) {
+                try {
+                    snap[col] = JSON.parse(row[i]);
+                } catch {
+                    snap[col] = row[i];
+                }
+            } else {
+                snap[col] = row[i];
+            }
+        });
         return snap;
     });
 }
